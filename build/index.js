@@ -1,0 +1,195 @@
+#!/usr/bin/env node
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import fetch from "node-fetch";
+import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
+function getVercelApiToken() {
+    const vercelApiToken = process.env.VERCEL_API_TOKEN;
+    if (!vercelApiToken) {
+        console.error("VERCEL_API_TOKEN environment variable is not set");
+        process.exit(1);
+    }
+    return vercelApiToken;
+}
+const VERCEL_API_TOKEN = getVercelApiToken();
+const VERCEL_API = "https://api.vercel.com/";
+// Tool definitions
+const VERCEL_ALL_DEPLOYMENTS_TOOL = {
+    name: "vercel-list-all-deployments",
+    description: "List deployments under the authenticated user or team.",
+    inputSchema: {
+        type: "object",
+        properties: {
+            app: {
+                type: "string",
+                description: "Name of the deployment",
+            },
+            limit: {
+                type: "number",
+                description: "Number of deployments to return",
+            },
+            projectId: {
+                type: "string",
+                description: "Filter deployments from the given ID or name",
+            },
+            state: {
+                type: "string",
+                description: "Filter deployments based on their state (BUILDING, ERROR, INITIALIZING, QUEUED, READY, CANCELED). Ex: 'BUILDING,READY'",
+            },
+            target: {
+                type: "string",
+                description: "Filter deployments based on the environment. Ex 'production'",
+            },
+        },
+    },
+};
+const server = new Server({
+    name: "vercel",
+    version: "0.1.0",
+}, {
+    capabilities: {
+        tools: {},
+        resources: {},
+    },
+});
+const VERCEL_TOOLS = [VERCEL_ALL_DEPLOYMENTS_TOOL];
+async function vercelFetch(endpoint) {
+    try {
+        const headers = {
+            Authorization: `Bearer ${VERCEL_API_TOKEN}`,
+            "Content-Type": "application/json",
+            //...options.headers,
+        };
+        const response = await fetch(`${VERCEL_API}${endpoint}`, {
+            //...options,
+            headers,
+        });
+        if (!response.ok) {
+            throw new Error(`Vercel API error: ${response.status}`);
+        }
+        return (await response.json());
+    }
+    catch (error) {
+        console.error("Vercel API error:", error);
+        return null;
+    }
+}
+const DeploymentsArgumentsSchema = z.object({
+    app: z.string().optional(),
+    limit: z.number().optional(),
+    projectId: z.string().optional(),
+    state: z.string().optional(),
+    target: z.string().optional(),
+    teamId: z.string().optional(),
+});
+// API handlers
+async function handleAllDeployments(params = {}) {
+    try {
+        const { app, projectId, state, target, teamId, limit } = DeploymentsArgumentsSchema.parse(params);
+        let url = limit
+            ? `v6/deployments?limit=${limit}`
+            : "v6/deployments?limit=50";
+        if (app)
+            url += `&app=${app}`;
+        if (projectId)
+            url += `&projectId=${projectId}`;
+        if (state)
+            url += `&state=${state}`;
+        if (target)
+            url += `&target=${target}`;
+        if (teamId)
+            url += `&teamId=${teamId}`;
+        const data = await vercelFetch(url);
+        if (!data) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: "Failed to retrieve deployments",
+                    },
+                ],
+            };
+        }
+        const deployments = data.deployments || [];
+        if (deployments.length === 0) {
+            return {
+                content: [
+                    {
+                        type: "text",
+                        text: `No active deployments`,
+                    },
+                ],
+            };
+        }
+        return JSON.stringify(deployments, null, 2);
+        //const formattedDeployments = deployments.map(formatDeployment);
+        //return formattedDeployments;*/
+    }
+    catch (error) {
+        console.error("Error in handleAllDeployments:", error);
+        return {
+            content: [{ type: "text", text: "Error in handleAllDeployments" }],
+        };
+    }
+}
+function formatDeployment(deployment) {
+    const props = deployment;
+    return [
+        `Name: ${props.name || "Unknown"}`,
+        `State: ${props.state || "Unknown"}`,
+        `Target: ${props.target || "Unknown"}`,
+        `URL: ${props.url || "Unknown"}`,
+        `Created At: ${props.createdAt || "Unknown"}`,
+        `Meta: ${JSON.stringify(props.meta) || "Unknown"}`,
+    ].join("\n");
+}
+// Set up request handlers
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+        tools: VERCEL_TOOLS,
+    };
+});
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    try {
+        const { name, args } = request.params;
+        switch (name) {
+            case VERCEL_ALL_DEPLOYMENTS_TOOL.name:
+                const deployments = await handleAllDeployments(args);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: deployments,
+                        },
+                    ],
+                };
+            default:
+                throw new Error(`Unknown tool: ${request.params.name}`);
+        }
+    }
+    catch (error) {
+        return {
+            _meta: {},
+            result: {
+                content: [
+                    {
+                        type: "text",
+                        text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+                        isError: true,
+                    },
+                ],
+            },
+        };
+    }
+});
+// Start the server
+async function main() {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Vercel MCP Server running on stdio");
+}
+main().catch((error) => {
+    console.error("Fatal error in main():", error);
+    process.exit(1);
+});
