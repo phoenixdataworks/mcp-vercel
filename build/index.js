@@ -3,7 +3,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import fetch from "node-fetch";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import { DeploymentsArgumentsSchema } from "./schema.js";
 function getVercelApiToken() {
     const vercelApiToken = process.env.VERCEL_API_TOKEN;
     if (!vercelApiToken) {
@@ -54,12 +54,12 @@ const server = new Server({
     },
 });
 const VERCEL_TOOLS = [VERCEL_ALL_DEPLOYMENTS_TOOL];
-async function vercelFetch(endpoint) {
+async function vercelFetch(endpoint, options = {}) {
     try {
         const headers = {
             Authorization: `Bearer ${VERCEL_API_TOKEN}`,
             "Content-Type": "application/json",
-            //...options.headers,
+            ...options.headers,
         };
         const response = await fetch(`${VERCEL_API}${endpoint}`, {
             //...options,
@@ -75,14 +75,6 @@ async function vercelFetch(endpoint) {
         return null;
     }
 }
-const DeploymentsArgumentsSchema = z.object({
-    app: z.string().optional(),
-    limit: z.number().optional(),
-    projectId: z.string().optional(),
-    state: z.string().optional(),
-    target: z.string().optional(),
-    teamId: z.string().optional(),
-});
 // API handlers
 async function handleAllDeployments(params = {}) {
     try {
@@ -122,9 +114,15 @@ async function handleAllDeployments(params = {}) {
                 ],
             };
         }
-        return JSON.stringify(deployments, null, 2);
-        //const formattedDeployments = deployments.map(formatDeployment);
-        //return formattedDeployments;*/
+        const result = JSON.stringify(deployments, null, 2);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: result,
+                },
+            ],
+        };
     }
     catch (error) {
         console.error("Error in handleAllDeployments:", error);
@@ -132,17 +130,6 @@ async function handleAllDeployments(params = {}) {
             content: [{ type: "text", text: "Error in handleAllDeployments" }],
         };
     }
-}
-function formatDeployment(deployment) {
-    const props = deployment;
-    return [
-        `Name: ${props.name || "Unknown"}`,
-        `State: ${props.state || "Unknown"}`,
-        `Target: ${props.target || "Unknown"}`,
-        `URL: ${props.url || "Unknown"}`,
-        `Created At: ${props.createdAt || "Unknown"}`,
-        `Meta: ${JSON.stringify(props.meta) || "Unknown"}`,
-    ].join("\n");
 }
 // Set up request handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -156,16 +143,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         switch (name) {
             case VERCEL_ALL_DEPLOYMENTS_TOOL.name:
                 const deployments = await handleAllDeployments(args);
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: deployments,
-                        },
-                    ],
-                };
+                return deployments;
             default:
-                throw new Error(`Unknown tool: ${request.params.name}`);
+                throw new Error(`Unknown tool: ${name}`);
         }
     }
     catch (error) {
