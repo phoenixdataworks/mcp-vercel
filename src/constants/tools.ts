@@ -103,6 +103,32 @@ export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
   }
 };
 
+export const VERCEL_LIST_TEAMS_TOOL: Tool = {
+  name: "vercel-list-all-teams",
+  description: "List all teams under the authenticated account",
+  inputSchema: {
+    type: "object",
+    properties: {
+      limit: {
+        type: "number",
+        description: "Maximum number of teams to return"
+      },
+      since: {
+        type: "number",
+        description: "Timestamp in milliseconds to get teams created after this time"
+      },
+      until: {
+        type: "number",
+        description: "Timestamp in milliseconds to get teams created before this time"
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID to scope the request"
+      }
+    }
+  }
+};
+
 export const VERCEL_CREATE_PROJECT_TOOL: Tool = {
   name: "vercel-create-project",
   description: "Create a new Vercel project",
@@ -163,5 +189,6 @@ export const VERCEL_TOOLS = [
   VERCEL_GET_ENVIRONMENTS_TOOL,
   VERCEL_GET_DEPLOYMENT_TOOL,
   VERCEL_CREATE_DEPLOYMENT_TOOL,
-  VERCEL_CREATE_PROJECT_TOOL
+  VERCEL_CREATE_PROJECT_TOOL,
+  VERCEL_LIST_TEAMS_TOOL
 ] as const;

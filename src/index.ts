@@ -13,6 +13,7 @@ import {
 } from "./tools/deployments/handlers.js";
 import { handleCreateProject } from "./tools/projects/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
+import { handleListTeams } from "./tools/teams/handlers.js";
 
 const server = new Server(
   {
@@ -48,6 +49,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleCreateDeployment(args);
       case "vercel-create-project":
         return await handleCreateProject(args);
+      case "vercel-list-all-teams":
+        return await handleListTeams(args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
