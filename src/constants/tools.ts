@@ -47,7 +47,27 @@ export const VERCEL_GET_ENVIRONMENTS_TOOL: Tool = {
   },
 };
 
+export const VERCEL_GET_DEPLOYMENT_TOOL: Tool = {
+  name: "vercel-get-deployment",
+  description: "Get a deployment by its ID or URL",
+  inputSchema: {
+    type: "object",
+    properties: {
+      idOrUrl: {
+        type: "string",
+        description: "ID or URL of the deployment to retrieve",
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID to scope the request",
+      },
+    },
+    required: ["idOrUrl"],
+  },
+};
+
 export const VERCEL_TOOLS = [
   VERCEL_ALL_DEPLOYMENTS_TOOL,
   VERCEL_GET_ENVIRONMENTS_TOOL,
+  VERCEL_GET_DEPLOYMENT_TOOL,
 ] as const;

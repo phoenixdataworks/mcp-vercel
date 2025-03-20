@@ -2,6 +2,31 @@ import { vercelFetch } from "../../utils/api.js";
 import type { DeploymentsResponse } from "./types.js";
 import { DeploymentsArgumentsSchema } from "../../schema.js";
 
+export async function handleGetDeployment(params: any = {}) {
+  try {
+    const { idOrUrl, teamId } = GetDeploymentArgumentsSchema.parse(params);
+    
+    let url = `v13/deployments/${encodeURIComponent(idOrUrl)}`;
+    if (teamId) url += `?teamId=${teamId}`;
+
+    const data = await vercelFetch<Deployment>(url);
+
+    if (!data) {
+      return {
+        content: [{ type: "text", text: "Failed to retrieve deployment" }],
+      };
+    }
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+    };
+  } catch (error) {
+    return {
+      content: [{ type: "text", text: `Error: ${error}` }],
+    };
+  }
+}
+
 export async function handleAllDeployments(params: any = {}) {
   try {
     const { app, projectId, state, target, teamId, limit } =

@@ -8,3 +8,8 @@ export const DeploymentsArgumentsSchema = z.object({
   target: z.string().optional(),
   teamId: z.string().optional(),
 });
+
+export const GetDeploymentArgumentsSchema = z.object({
+  idOrUrl: z.string(),
+  teamId: z.string().optional(),
+});

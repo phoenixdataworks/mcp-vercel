@@ -6,7 +6,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { VERCEL_TOOLS } from "./constants/tools.js";
-import { handleAllDeployments } from "./tools/deployments/handlers.js";
+import { handleAllDeployments, handleGetDeployment } from "./tools/deployments/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
 
 const server = new Server(
@@ -37,6 +37,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleAllDeployments(args);
       case "vercel-get-environments":
         return await handleGetEnvironments(request.params as any);
+      case "vercel-get-deployment":
+        return await handleGetDeployment(args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
