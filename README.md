@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) integration for Vercel's REST API, providing programmatic access to Vercel deployment management.
 
-## 📋 Overview
+## 📋 Overview <sub><sup>Last updated: July 2024</sup></sub>
 
 This MCP server implements Vercel's core API endpoints as tools, enabling:
 - Deployment monitoring & management
@@ -16,12 +16,69 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
 - `vercel-get-environments` - Access project environment variables
+- `vercel-create-deployment` - Create new deployments
+- `vercel-create-project` - Create new Vercel projects
+- `vercel-list-all-teams` - List all accessible teams
 
-### Planned Features
-- [ ] Deployment creation workflow
+## 🛣️ Roadmap
+
+- [x] Deployment creation workflow
+- [x] Project management tools
+- [x] Team management integration
 - [ ] Real-time deployment monitoring
 - [ ] Advanced error handling
-- [ ] Team management integration
+- [ ] Deployment metrics dashboard
+- [ ] Team member management operations
+
+## Tools
+
+### `vercel-list-all-deployments`
+List deployments under the authenticated user or team
+- **Inputs**:
+  - `app` (string): Filter by deployment name
+  - `projectId` (string): Filter by project ID/name
+  - `state` (string): Filter by state (BUILDING, ERROR, INITIALIZING, QUEUED, READY, CANCELED)
+  - `target` (string): Filter by environment (production/preview)
+  - `limit` (number): Number of deployments to return
+- **Returns**: Array of deployment objects with status, URLs, and metadata
+
+### `vercel-get-deployment`
+Get detailed information about a specific deployment
+- **Inputs**:
+  - `idOrUrl` (string): Deployment ID or URL (required)
+  - `teamId` (string): Team ID for request scoping
+- **Returns**: Full deployment details including build logs, domains, and environment variables
+
+### `vercel-create-deployment`
+Create a new Vercel deployment
+- **Inputs**:
+  - `name` (string): Deployment/project name (required)
+  - `project` (string): Project ID/name (required)
+  - `target` (string): Environment (production/preview)
+  - `regions` (string[]): Deployment regions
+  - `teamId` (string): Team ID for scoping
+  - `forceNew` (boolean): Force new deployment
+- **Returns**: Created deployment details with status URLs
+
+### `vercel-create-project`
+Create a new Vercel project
+- **Inputs**:
+  - `name` (string): Project name (required)
+  - `framework` (string): Framework preset
+  - `buildCommand` (string): Custom build command
+  - `devCommand` (string): Custom dev command
+  - `outputDirectory` (string): Build output directory
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Project configuration with deployment settings
+
+### `vercel-list-all-teams`
+List all teams accessible to authenticated user
+- **Inputs**:
+  - `limit` (number): Maximum results to return
+  - `since` (number): Timestamp for teams created after
+  - `until` (number): Timestamp for teams created before
+  - `teamId` (string): Team ID for request scoping
+- **Returns**: Paginated list of team objects with metadata
 
 ## 🚀 Getting Started
 
