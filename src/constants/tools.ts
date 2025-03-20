@@ -103,9 +103,65 @@ export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
   }
 };
 
+export const VERCEL_CREATE_PROJECT_TOOL: Tool = {
+  name: "vercel-create-project",
+  description: "Create a new Vercel project",
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: "Name of the project"
+      },
+      framework: {
+        type: "string",
+        description: "Framework preset"
+      },
+      buildCommand: {
+        type: "string",
+        description: "Build command"
+      },
+      devCommand: {
+        type: "string",
+        description: "Development command"
+      },
+      installCommand: {
+        type: "string",
+        description: "Install command"
+      },
+      outputDirectory: {
+        type: "string",
+        description: "Output directory"
+      },
+      publicSource: {
+        type: "boolean",
+        description: "Make project public"
+      },
+      rootDirectory: {
+        type: "string",
+        description: "Root directory"
+      },
+      serverlessFunctionRegion: {
+        type: "string",
+        description: "Serverless function region"
+      },
+      skipGitConnectDuringLink: {
+        type: "boolean",
+        description: "Skip Git connection"
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID for scoping"
+      }
+    },
+    required: ["name"]
+  }
+};
+
 export const VERCEL_TOOLS = [
   VERCEL_ALL_DEPLOYMENTS_TOOL,
   VERCEL_GET_ENVIRONMENTS_TOOL,
   VERCEL_GET_DEPLOYMENT_TOOL,
-  VERCEL_CREATE_DEPLOYMENT_TOOL
+  VERCEL_CREATE_DEPLOYMENT_TOOL,
+  VERCEL_CREATE_PROJECT_TOOL
 ] as const;
