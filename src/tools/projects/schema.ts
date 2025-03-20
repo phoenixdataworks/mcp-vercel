@@ -11,5 +11,5 @@ export const CreateProjectArgumentsSchema = z.object({
   rootDirectory: z.string().optional(),
   serverlessFunctionRegion: z.string().optional(),
   skipGitConnectDuringLink: z.boolean().optional(),
-  teamId: z.string().optional(),
+  teamId: z.string().min(1, "Team ID is required"),
 });
