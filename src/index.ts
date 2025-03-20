@@ -6,7 +6,11 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { VERCEL_TOOLS } from "./constants/tools.js";
-import { handleAllDeployments, handleGetDeployment } from "./tools/deployments/handlers.js";
+import {
+  handleAllDeployments,
+  handleCreateDeployment,
+  handleGetDeployment,
+} from "./tools/deployments/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
 
 const server = new Server(
