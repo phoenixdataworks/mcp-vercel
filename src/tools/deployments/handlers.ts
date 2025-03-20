@@ -3,6 +3,7 @@ import type { Deployment, DeploymentsResponse } from "./types.js";
 import {
   ListDeploymentsArgumentsSchema,
   GetDeploymentArgumentsSchema,
+  CreateDeploymentArgumentsSchema,
 } from "./schema.js";
 
 export async function handleGetDeployment(params: any = {}) {
@@ -32,44 +33,51 @@ export async function handleGetDeployment(params: any = {}) {
 
 export async function handleCreateDeployment(params: any = {}) {
   try {
-    const { name, project, target, regions, teamId, forceNew } = 
+    const { name, project, target, regions, teamId, forceNew } =
       CreateDeploymentArgumentsSchema.parse(params);
 
-    const url = `v13/deployments${teamId ? `?teamId=${teamId}` : ''}`;
-    
+    const url = `v13/deployments${teamId ? `?teamId=${teamId}` : ""}`;
+
     const deploymentData = {
       name,
       project,
       target: target || "production",
       ...(regions && { regions }),
-      ...(forceNew && { forceNew: 1 })
+      ...(forceNew && { forceNew: 1 }),
     };
 
     const data = await vercelFetch<Deployment>(url, {
-      method: 'POST',
-      body: JSON.stringify(deploymentData)
+      method: "POST",
+      body: JSON.stringify(deploymentData),
     });
 
     if (!data) {
       return {
-        content: [{ type: "text", text: "Failed to create deployment" }]
+        content: [{ type: "text", text: "Failed to create deployment" }],
       };
     }
 
     return {
-      content: [{
-        type: "text", 
-        text: `Deployment created successfully: ${data.url}\n` + 
-              JSON.stringify(data, null, 2)
-      }]
+      content: [
+        {
+          type: "text",
+          text:
+            `Deployment created successfully: ${data.url}\n` +
+            JSON.stringify(data, null, 2),
+        },
+      ],
     };
   } catch (error) {
     return {
-      content: [{
-        type: "text",
-        text: `Error creating deployment: ${error instanceof Error ? error.message : String(error)}`,
-        isError: true
-      }]
+      content: [
+        {
+          type: "text",
+          text: `Error creating deployment: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+          isError: true,
+        },
+      ],
     };
   }
 }
