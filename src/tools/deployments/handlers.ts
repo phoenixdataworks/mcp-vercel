@@ -1,11 +1,14 @@
 import { vercelFetch } from "../../utils/api.js";
-import type { DeploymentsResponse } from "./types.js";
-import { DeploymentsArgumentsSchema } from "../../schema.js";
+import type { Deployment, DeploymentsResponse } from "./types.js";
+import {
+  ListDeploymentsArgumentsSchema,
+  GetDeploymentArgumentsSchema,
+} from "./schema.js";
 
 export async function handleGetDeployment(params: any = {}) {
   try {
     const { idOrUrl, teamId } = GetDeploymentArgumentsSchema.parse(params);
-    
+
     let url = `v13/deployments/${encodeURIComponent(idOrUrl)}`;
     if (teamId) url += `?teamId=${teamId}`;
 
@@ -30,7 +33,7 @@ export async function handleGetDeployment(params: any = {}) {
 export async function handleAllDeployments(params: any = {}) {
   try {
     const { app, projectId, state, target, teamId, limit } =
-      DeploymentsArgumentsSchema.parse(params);
+      ListDeploymentsArgumentsSchema.parse(params);
 
     let url = limit
       ? `v6/deployments?limit=${limit}`

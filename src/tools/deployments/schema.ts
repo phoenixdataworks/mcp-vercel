@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const DeploymentsArgumentsSchema = z.object({
+export const ListDeploymentsArgumentsSchema = z.object({
   app: z.string().optional(),
   limit: z.number().optional(),
   projectId: z.string().optional(),

@@ -1,28 +1,5 @@
 import { vercelFetch } from "../../utils/api.js";
-
-// Interface for the environment variables according to the Vercel v10 API
-interface EnvironmentVariable {
-  id: string;
-  key: string;
-  value: string;
-  target: string[];
-  type: string;
-  configurationId: string | null;
-  createdAt: number;
-  updatedAt: number;
-  gitBranch?: string;
-}
-
-interface EnvironmentVariablesResponse {
-  envs: EnvironmentVariable[];
-}
-
-//  Interface for the input parameters
-interface GetEnvironmentsParams {
-  arguments: {
-    idOrName: string;
-  };
-}
+import { GetEnvironmentsParams } from "./type.js";
 
 /**
  * Retrieves environment variables for a Vercel project specified by ID or name
