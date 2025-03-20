@@ -6,6 +6,13 @@ export interface Deployment {
   url: string;
   inspectorUrl: string;
   createdAt: number;
+  alias: string[];
+  regions: string[];
+  builds: {
+    src: string;
+    use: string;
+    config?: Record<string, any>;
+  }[];
   meta: {
     githubCommitAuthorName: string;
     githubCommitMessage: string;

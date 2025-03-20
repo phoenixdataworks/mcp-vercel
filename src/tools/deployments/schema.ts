@@ -13,3 +13,12 @@ export const GetDeploymentArgumentsSchema = z.object({
   idOrUrl: z.string(),
   teamId: z.string().optional(),
 });
+
+export const CreateDeploymentArgumentsSchema = z.object({
+  name: z.string(),
+  project: z.string(),
+  target: z.enum(["production", "preview"]).optional(),
+  regions: z.array(z.string()).optional(),
+  teamId: z.string().optional(),
+  forceNew: z.boolean().optional()
+});

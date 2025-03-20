@@ -66,8 +66,46 @@ export const VERCEL_GET_DEPLOYMENT_TOOL: Tool = {
   },
 };
 
+export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
+  name: "vercel-create-deployment",
+  description: "Create a new Vercel deployment",
+  inputSchema: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: "Name of the deployment/project"
+      },
+      project: {
+        type: "string",
+        description: "Project ID or name"
+      },
+      target: {
+        type: "string",
+        description: "Deployment target environment (production, preview)",
+        enum: ["production", "preview"]
+      },
+      regions: {
+        type: "array",
+        items: { type: "string" },
+        description: "Regions to deploy to"
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID for scoping"
+      },
+      forceNew: {
+        type: "boolean",
+        description: "Force new deployment even if identical exists"
+      }
+    },
+    required: ["name", "project"]
+  }
+};
+
 export const VERCEL_TOOLS = [
   VERCEL_ALL_DEPLOYMENTS_TOOL,
   VERCEL_GET_ENVIRONMENTS_TOOL,
   VERCEL_GET_DEPLOYMENT_TOOL,
+  VERCEL_CREATE_DEPLOYMENT_TOOL
 ] as const;

@@ -39,6 +39,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleGetEnvironments(request.params as any);
       case "vercel-get-deployment":
         return await handleGetDeployment(args);
+      case "vercel-create-deployment":
+        return await handleCreateDeployment(args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }

@@ -30,6 +30,50 @@ export async function handleGetDeployment(params: any = {}) {
   }
 }
 
+export async function handleCreateDeployment(params: any = {}) {
+  try {
+    const { name, project, target, regions, teamId, forceNew } = 
+      CreateDeploymentArgumentsSchema.parse(params);
+
+    const url = `v13/deployments${teamId ? `?teamId=${teamId}` : ''}`;
+    
+    const deploymentData = {
+      name,
+      project,
+      target: target || "production",
+      ...(regions && { regions }),
+      ...(forceNew && { forceNew: 1 })
+    };
+
+    const data = await vercelFetch<Deployment>(url, {
+      method: 'POST',
+      body: JSON.stringify(deploymentData)
+    });
+
+    if (!data) {
+      return {
+        content: [{ type: "text", text: "Failed to create deployment" }]
+      };
+    }
+
+    return {
+      content: [{
+        type: "text", 
+        text: `Deployment created successfully: ${data.url}\n` + 
+              JSON.stringify(data, null, 2)
+      }]
+    };
+  } catch (error) {
+    return {
+      content: [{
+        type: "text",
+        text: `Error creating deployment: ${error instanceof Error ? error.message : String(error)}`,
+        isError: true
+      }]
+    };
+  }
+}
+
 export async function handleAllDeployments(params: any = {}) {
   try {
     const { app, projectId, state, target, teamId, limit } =
