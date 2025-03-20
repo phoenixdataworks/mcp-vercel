@@ -71,6 +71,41 @@ const deployment = await mcpClient.callTool({
 });
 ```
 
+## 🐳 Docker Deployment
+
+### Build the Image
+```bash
+docker build -t vercel-mcp .
+```
+
+### Run Container
+```bash
+docker run -it --rm \
+  -e VERCEL_API_TOKEN=your_token_here \
+  -p 3399:3399 \
+  vercel-mcp
+```
+
+### Production Deployment
+```bash
+docker run -d \
+  --name vercel-mcp \
+  --restart unless-stopped \
+  -e VERCEL_API_TOKEN=your_token_here \
+  -p 3399:3399 \
+  vercel-mcp
+```
+
+### Development with Live Reload
+```bash
+docker build --target builder -t vercel-mcp-dev .
+docker run -it --rm \
+  -e VERCEL_API_TOKEN=your_token_here \
+  -p 3399:3399 \
+  -v $(pwd)/src:/app/src \
+  vercel-mcp-dev
+```
+
 ## 🗂️ Project Structure
 
 ```
