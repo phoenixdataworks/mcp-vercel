@@ -5,6 +5,7 @@ A Model Context Protocol (MCP) integration for Vercel's REST API, providing prog
 ## 📋 Overview <sub><sup>Last updated: July 2024</sup></sub>
 
 This MCP server implements Vercel's core API endpoints as tools, enabling:
+
 - Deployment monitoring & management
 - Environment variable retrieval
 - Project deployment status tracking
@@ -13,6 +14,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 ## ✨ Features
 
 ### Current Tools
+
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
 - `vercel-get-environments` - Access project environment variables
@@ -33,7 +35,9 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 ## Tools
 
 ### `vercel-list-all-deployments`
+
 List deployments under the authenticated user or team
+
 - **Inputs**:
   - `app` (string): Filter by deployment name
   - `projectId` (string): Filter by project ID/name
@@ -43,14 +47,18 @@ List deployments under the authenticated user or team
 - **Returns**: Array of deployment objects with status, URLs, and metadata
 
 ### `vercel-get-deployment`
+
 Get detailed information about a specific deployment
+
 - **Inputs**:
   - `idOrUrl` (string): Deployment ID or URL (required)
   - `teamId` (string): Team ID for request scoping
 - **Returns**: Full deployment details including build logs, domains, and environment variables
 
 ### `vercel-create-deployment`
+
 Create a new Vercel deployment
+
 - **Inputs**:
   - `name` (string): Deployment/project name (required)
   - `project` (string): Project ID/name (required)
@@ -61,7 +69,9 @@ Create a new Vercel deployment
 - **Returns**: Created deployment details with status URLs
 
 ### `vercel-create-project`
+
 Create a new Vercel project
+
 - **Inputs**:
   - `name` (string): Project name (required)
   - `framework` (string): Framework preset
@@ -72,7 +82,9 @@ Create a new Vercel project
 - **Returns**: Project configuration with deployment settings
 
 ### `vercel-list-all-teams`
+
 List all teams accessible to authenticated user
+
 - **Inputs**:
   - `limit` (number): Maximum results to return
   - `since` (number): Timestamp for teams created after
@@ -83,11 +95,13 @@ List all teams accessible to authenticated user
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Vercel API Token
 - MCP Client
 
 ### Installation
+
 ```bash
 git clone [your-repo-url]
 cd vercel-mcp
@@ -95,12 +109,15 @@ npm install
 ```
 
 ### Configuration
+
 1. Create `.env` file:
+
 ```env
 VERCEL_API_TOKEN=your_api_token_here
 ```
 
 2. Start MCP server:
+
 ```bash
 npm start
 ```
@@ -108,34 +125,38 @@ npm start
 ## 🛠️ Usage Examples
 
 ### List Deployments
+
 ```javascript
 const response = await mcpClient.callTool({
-  name: 'vercel-list-all-deployments',
+  name: "vercel-list-all-deployments",
   args: {
     limit: 5,
-    target: 'production'
-  }
+    target: "production",
+  },
 });
 ```
 
 ### Get Specific Deployment
+
 ```javascript
 const deployment = await mcpClient.callTool({
-  name: 'vercel-get-deployment',
+  name: "vercel-get-deployment",
   args: {
-    idOrUrl: 'dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd'
-  }
+    idOrUrl: "dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd",
+  },
 });
 ```
 
 ## 🐳 Docker Deployment
 
 ### Build the Image
+
 ```bash
 docker build -t vercel-mcp .
 ```
 
 ### Run Container
+
 ```bash
 docker run -it --rm \
   -e VERCEL_API_TOKEN=your_token_here \
@@ -144,6 +165,7 @@ docker run -it --rm \
 ```
 
 ### Production Deployment
+
 ```bash
 docker run -d \
   --name vercel-mcp \
@@ -154,6 +176,7 @@ docker run -d \
 ```
 
 ### Development with Live Reload
+
 ```bash
 docker build --target builder -t vercel-mcp-dev .
 docker run -it --rm \
@@ -181,16 +204,10 @@ src/
 ## 🔧 Configuration
 
 ### Environment Variables
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `VERCEL_API_TOKEN` | Vercel access token | Yes |
 
-## 🛣️ Roadmap
-
-- [ ] Add deployment creation support
-- [ ] Implement deployment metrics
-- [ ] Add project management tools
-- [ ] Support team-based operations
+| Variable           | Description         | Required |
+| ------------------ | ------------------- | -------- |
+| `VERCEL_API_TOKEN` | Vercel access token | Yes      |
 
 ## 🤝 Contributing
 
