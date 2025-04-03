@@ -21,6 +21,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - `vercel-get-environments` - Access project environment variables
 - `vercel-create-deployment` - Create new deployments
 - `vercel-create-project` - Create new Vercel projects
+- `vercel-list-projects` - List all projects with pagination
 - `vercel-list-all-teams` - List all accessible teams
 
 ## 🛣️ Roadmap
