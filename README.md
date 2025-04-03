@@ -31,7 +31,6 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - [ ] Real-time deployment monitoring
 - [ ] Advanced error handling
 - [ ] Deployment metrics dashboard
-- [ ] Team member management operations
 
 ## Tools
 
@@ -87,6 +86,7 @@ Create a new Vercel project
 Create multiple environment variables for a project
 
 - **Inputs**:
+
   - `projectId` (string): Target project ID (required)
   - `teamId` (string): Team ID for request scoping
   - `environmentVariables` (array): Environment variables to create

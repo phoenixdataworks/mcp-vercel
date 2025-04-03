@@ -74,33 +74,33 @@ export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
     properties: {
       name: {
         type: "string",
-        description: "Name of the deployment/project"
+        description: "Name of the deployment/project",
       },
       project: {
         type: "string",
-        description: "Project ID or name"
+        description: "Project ID or name",
       },
       target: {
         type: "string",
         description: "Deployment target environment (production, preview)",
-        enum: ["production", "preview"]
+        enum: ["production", "preview"],
       },
       regions: {
         type: "array",
         items: { type: "string" },
-        description: "Regions to deploy to"
+        description: "Regions to deploy to",
       },
       teamId: {
         type: "string",
-        description: "Team ID for scoping"
+        description: "Team ID for scoping",
       },
       forceNew: {
         type: "boolean",
-        description: "Force new deployment even if identical exists"
-      }
+        description: "Force new deployment even if identical exists",
+      },
     },
-    required: ["name", "project"]
-  }
+    required: ["name", "project"],
+  },
 };
 
 export const VERCEL_LIST_TEAMS_TOOL: Tool = {
@@ -111,22 +111,24 @@ export const VERCEL_LIST_TEAMS_TOOL: Tool = {
     properties: {
       limit: {
         type: "number",
-        description: "Maximum number of teams to return"
+        description: "Maximum number of teams to return",
       },
       since: {
         type: "number",
-        description: "Timestamp in milliseconds to get teams created after this time"
+        description:
+          "Timestamp in milliseconds to get teams created after this time",
       },
       until: {
         type: "number",
-        description: "Timestamp in milliseconds to get teams created before this time"
+        description:
+          "Timestamp in milliseconds to get teams created before this time",
       },
       teamId: {
         type: "string",
-        description: "Team ID to scope the request"
-      }
-    }
-  }
+        description: "Team ID to scope the request",
+      },
+    },
+  },
 };
 
 export const VERCEL_CREATE_PROJECT_TOOL: Tool = {
@@ -137,51 +139,105 @@ export const VERCEL_CREATE_PROJECT_TOOL: Tool = {
     properties: {
       name: {
         type: "string",
-        description: "Name of the project"
+        description: "Name of the project",
       },
       framework: {
         type: "string",
-        description: "Framework preset"
+        description: "Framework preset",
       },
       buildCommand: {
         type: "string",
-        description: "Build command"
+        description: "Build command",
       },
       devCommand: {
         type: "string",
-        description: "Development command"
+        description: "Development command",
       },
       installCommand: {
         type: "string",
-        description: "Install command"
+        description: "Install command",
       },
       outputDirectory: {
         type: "string",
-        description: "Output directory"
+        description: "Output directory",
       },
       publicSource: {
         type: "boolean",
-        description: "Make project public"
+        description: "Make project public",
       },
       rootDirectory: {
         type: "string",
-        description: "Root directory"
+        description: "Root directory",
       },
       serverlessFunctionRegion: {
         type: "string",
-        description: "Serverless function region"
+        description: "Serverless function region",
       },
       skipGitConnectDuringLink: {
         type: "boolean",
-        description: "Skip Git connection"
+        description: "Skip Git connection",
       },
       teamId: {
         type: "string",
-        description: "Team ID for scoping"
-      }
+        description: "Team ID for scoping",
+      },
     },
-    required: ["name"]
-  }
+    required: ["name"],
+  },
+};
+
+export const VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL: Tool = {
+  name: "vercel-create-environment-variables",
+  description: "Create environment variables for a Vercel project",
+  inputSchema: {
+    type: "object",
+    properties: {
+      projectId: {
+        type: "string",
+        description: "Project ID to create environment variables for",
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID for scoping",
+      },
+      environmentVariables: {
+        type: "array",
+        description: "Array of environment variables to create",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string",
+              description: "Environment variable key name",
+            },
+            value: {
+              type: "string",
+              description: "Environment variable value",
+            },
+            target: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: ["production", "preview", "development"],
+              },
+              description: "Target environments for this variable",
+            },
+            type: {
+              type: "string",
+              enum: ["system", "encrypted", "plain", "sensitive"],
+              description: "Type of environment variable",
+            },
+            gitBranch: {
+              type: "string",
+              description: "Git branch to apply this variable to (optional)",
+            },
+          },
+          required: ["key", "value", "target", "type"],
+        },
+      },
+    },
+    required: ["projectId", "environmentVariables"],
+  },
 };
 
 export const VERCEL_TOOLS = [
@@ -191,5 +247,5 @@ export const VERCEL_TOOLS = [
   VERCEL_CREATE_DEPLOYMENT_TOOL,
   VERCEL_CREATE_PROJECT_TOOL,
   VERCEL_LIST_TEAMS_TOOL,
-  VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL
+  VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL,
 ] as const;

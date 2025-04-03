@@ -11,7 +11,10 @@ import {
   handleCreateDeployment,
   handleGetDeployment,
 } from "./tools/deployments/handlers.js";
-import { handleCreateProject } from "./tools/projects/handlers.js";
+import {
+  handleCreateProject,
+  handleCreateEnvironmentVariables,
+} from "./tools/projects/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
 import { handleListTeams } from "./tools/teams/handlers.js";
 

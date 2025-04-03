@@ -3,8 +3,8 @@ import { z } from "zod";
 export const EnvironmentVariableSchema = z.object({
   key: z.string().min(1, "Key is required"),
   value: z.string().min(1, "Value is required"),
-  target: z.array(z.enum(['production', 'preview', 'development']),
-  type: z.enum(['system', 'encrypted', 'plain', 'sensitive']),
+  target: z.array(z.enum(["production", "preview", "development"])),
+  type: z.enum(["system", "encrypted", "plain", "sensitive"]),
   gitBranch: z.string().optional(),
 });
 
