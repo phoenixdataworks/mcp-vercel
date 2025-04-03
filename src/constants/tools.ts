@@ -186,6 +186,32 @@ export const VERCEL_CREATE_PROJECT_TOOL: Tool = {
   },
 };
 
+export const VERCEL_LIST_PROJECTS_TOOL: Tool = {
+  name: "vercel-list-projects",
+  description: "List all projects under the authenticated user or team",
+  inputSchema: {
+    type: "object",
+    properties: {
+      limit: {
+        type: "number",
+        description: "Maximum number of projects to return"
+      },
+      since: {
+        type: "number",
+        description: "Timestamp in milliseconds to get projects created after this time"
+      },
+      until: {
+        type: "number",
+        description: "Timestamp in milliseconds to get projects created before this time"
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID for request scoping"
+      }
+    }
+  }
+};
+
 export const VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL: Tool = {
   name: "vercel-create-environment-variables",
   description: "Create environment variables for a Vercel project",
@@ -248,4 +274,5 @@ export const VERCEL_TOOLS = [
   VERCEL_CREATE_PROJECT_TOOL,
   VERCEL_LIST_TEAMS_TOOL,
   VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL,
+  VERCEL_LIST_PROJECTS_TOOL,
 ] as const;

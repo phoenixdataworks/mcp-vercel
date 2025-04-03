@@ -43,6 +43,48 @@ export async function handleCreateEnvironmentVariables(params: any = {}) {
   }
 }
 
+export async function handleListProjects(params: any = {}) {
+  try {
+    const { limit, since, until, teamId } = ListProjectsArgumentsSchema.parse(params);
+    
+    const url = new URL('v10/projects', 'https://api.vercel.com/');
+    const queryParams = new URLSearchParams();
+    
+    if (limit) queryParams.append('limit', limit.toString());
+    if (since) queryParams.append('since', since.toString());
+    if (until) queryParams.append('until', until.toString());
+    if (teamId) queryParams.append('teamId', teamId);
+    
+    const fullUrl = `${url}?${queryParams.toString()}`;
+    const data = await vercelFetch<ListProjectsResponse>(fullUrl);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${data?.projects.length} projects`,
+        },
+        {
+          type: "text",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error: ${
+            error instanceof Error ? error.message : "Failed to list projects"
+          }`,
+          isError: true,
+        },
+      ],
+    };
+  }
+}
+
 export async function handleCreateProject(params: any = {}) {
   try {
     const {

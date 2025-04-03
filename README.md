@@ -109,6 +109,24 @@ List all teams accessible to authenticated user
   - `teamId` (string): Team ID for request scoping
 - **Returns**: Paginated list of team objects with metadata
 
+### `vercel-list-projects`
+
+List all projects under the authenticated user or team
+
+- **Inputs**:
+  - `limit` (number): Maximum number of projects to return
+  - `since` (number): Timestamp for projects created after
+  - `until` (number): Timestamp for projects created before
+  - `teamId` (string): Team ID for request scoping
+  
+- **Returns**: Paginated list of project objects with metadata including:
+  - `id`: Project ID
+  - `name`: Project name
+  - `framework`: Associated framework
+  - `latestDeployments`: Array of recent deployments
+  - `createdAt`: Creation timestamp
+  - Pagination info with next/previous cursors
+
 ## 🚀 Getting Started
 
 ### Prerequisites

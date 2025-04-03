@@ -27,3 +27,10 @@ export const CreateProjectArgumentsSchema = z.object({
   skipGitConnectDuringLink: z.boolean().optional(),
   teamId: z.string().min(1, "Team ID is required"),
 });
+
+export const ListProjectsArgumentsSchema = z.object({
+  limit: z.number().int().positive().optional(),
+  since: z.number().int().optional(),
+  until: z.number().int().optional(),
+  teamId: z.string().optional(),
+});

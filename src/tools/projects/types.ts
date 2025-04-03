@@ -32,6 +32,15 @@ export interface EnvironmentVariablesResponse {
   }[];
 }
 
+export interface ListProjectsResponse {
+  projects: Project[];
+  pagination: {
+    count: number;
+    next: number | null;
+    prev: number | null;
+  };
+}
+
 export interface ProjectResponse {
   id: string;
   name: string;
