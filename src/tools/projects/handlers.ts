@@ -1,16 +1,25 @@
 import { vercelFetch } from "../../utils/api.js";
-import { 
+import { VERCEL_API } from "../../utils/config.js";
+import {
   CreateProjectArgumentsSchema,
-  CreateEnvironmentVariablesSchema
+  CreateEnvironmentVariablesSchema,
+  ListProjectsArgumentsSchema,
 } from "./schema.js";
-import type { ProjectResponse, EnvironmentVariablesResponse } from "./types.js";
+import type {
+  ProjectResponse,
+  EnvironmentVariablesResponse,
+  ListProjectsResponse,
+} from "./types.js";
 
 export async function handleCreateEnvironmentVariables(params: any = {}) {
   try {
-    const { projectId, teamId, environmentVariables } = CreateEnvironmentVariablesSchema.parse(params);
-    
-    const url = `v10/projects/${encodeURIComponent(projectId)}/env${teamId ? `?teamId=${teamId}` : ""}`;
-    
+    const { projectId, teamId, environmentVariables } =
+      CreateEnvironmentVariablesSchema.parse(params);
+
+    const url = `v10/projects/${encodeURIComponent(projectId)}/env${
+      teamId ? `?teamId=${teamId}` : ""
+    }`;
+
     const data = await vercelFetch<EnvironmentVariablesResponse>(url, {
       method: "POST",
       body: JSON.stringify(environmentVariables),
@@ -34,7 +43,9 @@ export async function handleCreateEnvironmentVariables(params: any = {}) {
         {
           type: "text",
           text: `Error: ${
-            error instanceof Error ? error.message : "Failed to create environment variables"
+            error instanceof Error
+              ? error.message
+              : "Failed to create environment variables"
           }`,
           isError: true,
         },
@@ -45,16 +56,15 @@ export async function handleCreateEnvironmentVariables(params: any = {}) {
 
 export async function handleListProjects(params: any = {}) {
   try {
-    const { limit, since, until, teamId } = ListProjectsArgumentsSchema.parse(params);
-    
-    const url = new URL('v10/projects', 'https://api.vercel.com/');
+    const { limit, from, teamId } = ListProjectsArgumentsSchema.parse(params);
+
+    const url = new URL("v10/projects", VERCEL_API);
     const queryParams = new URLSearchParams();
-    
-    if (limit) queryParams.append('limit', limit.toString());
-    if (since) queryParams.append('since', since.toString());
-    if (until) queryParams.append('until', until.toString());
-    if (teamId) queryParams.append('teamId', teamId);
-    
+
+    if (limit) queryParams.append("limit", limit.toString());
+    if (from) queryParams.append("from", from.toString());
+    if (teamId) queryParams.append("teamId", teamId);
+
     const fullUrl = `${url}?${queryParams.toString()}`;
     const data = await vercelFetch<ListProjectsResponse>(fullUrl);
 

@@ -20,7 +20,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - `vercel-create-deployment` - Create new deployments
 - `vercel-create-project` - Create new Vercel projects
 - `vercel-create-environment-variables` - Create multiple environment variables
-- `vercel-get-environments` - Access project environment variables 
+- `vercel-get-environments` - Access project environment variables
 - `vercel-list-projects` - List all projects with pagination
 - `vercel-list-all-teams` - List all accessible teams
 
@@ -116,17 +116,14 @@ List all projects under the authenticated user or team
 
 - **Inputs**:
   - `limit` (number): Maximum number of projects to return
-  - `since` (number): Timestamp for projects created after
-  - `until` (number): Timestamp for projects created before
+  - `from` (number): Timestamp for projects created
   - `teamId` (string): Team ID for request scoping
-  
 - **Returns**: Paginated list of project objects with metadata including:
   - `id`: Project ID
   - `name`: Project name
   - `framework`: Associated framework
   - `latestDeployments`: Array of recent deployments
   - `createdAt`: Creation timestamp
-  - Pagination info with next/previous cursors
 
 ## 🚀 Getting Started
 

@@ -1,6 +1,7 @@
 export interface Project {
   id: string;
   name: string;
+  accountId: string;
   framework: string | null;
   latestDeployments: {
     alias: string[];
@@ -11,6 +12,7 @@ export interface Project {
     };
   };
   createdAt: number;
+  updatedAt: number;
 }
 
 export interface EnvironmentVariable {
@@ -48,11 +50,4 @@ export interface ProjectResponse {
   createdAt: number;
   updatedAt: number;
   framework: string | null;
-  devCommand: string | null;
-  installCommand: string | null;
-  buildCommand: string | null;
-  outputDirectory: string | null;
-  rootDirectory: string | null;
-  serverlessFunctionRegion: string | null;
-  publicSource: boolean | null;
 }

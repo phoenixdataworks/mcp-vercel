@@ -30,7 +30,6 @@ export const CreateProjectArgumentsSchema = z.object({
 
 export const ListProjectsArgumentsSchema = z.object({
   limit: z.number().int().positive().optional(),
-  since: z.number().int().optional(),
-  until: z.number().int().optional(),
+  from: z.number().int().optional(),
   teamId: z.string().optional(),
 });

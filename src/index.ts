@@ -14,6 +14,7 @@ import {
 import {
   handleCreateProject,
   handleCreateEnvironmentVariables,
+  handleListProjects,
 } from "./tools/projects/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
 import { handleListTeams } from "./tools/teams/handlers.js";
