@@ -15,6 +15,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 
 ### Current Tools
 
+- `vercel-create-environment-variables` - Create multiple environment variables
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
 - `vercel-get-environments` - Access project environment variables
@@ -80,6 +81,22 @@ Create a new Vercel project
   - `outputDirectory` (string): Build output directory
   - `teamId` (string): Team ID for scoping
 - **Returns**: Project configuration with deployment settings
+
+### `vercel-create-environment-variables`
+
+Create multiple environment variables for a project
+
+- **Inputs**:
+  - `projectId` (string): Target project ID (required)
+  - `teamId` (string): Team ID for request scoping
+  - `environmentVariables` (array): Environment variables to create
+    - `key` (string): Variable name (required)
+    - `value` (string): Variable value (required)
+    - `target` (string[]): Deployment targets (production/preview/development)
+    - `type` (string): Variable type (system/encrypted/plain/sensitive)
+    - `gitBranch` (string): Optional git branch for variable
+
+- **Returns**: Object with created variables and any skipped entries
 
 ### `vercel-list-all-teams`
 

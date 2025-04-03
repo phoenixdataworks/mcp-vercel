@@ -13,6 +13,25 @@ export interface Project {
   createdAt: number;
 }
 
+export interface EnvironmentVariable {
+  key: string;
+  value: string;
+  target: string[];
+  type: string;
+  gitBranch?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface EnvironmentVariablesResponse {
+  created: EnvironmentVariable[];
+  skipped: {
+    key: string;
+    code: string;
+    message: string;
+  }[];
+}
+
 export interface ProjectResponse {
   id: string;
   name: string;

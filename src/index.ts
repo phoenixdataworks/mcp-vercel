@@ -51,6 +51,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleCreateProject(args);
       case "vercel-list-all-teams":
         return await handleListTeams(args);
+      case "vercel-create-environment-variables":
+        return await handleCreateEnvironmentVariables(args);
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
