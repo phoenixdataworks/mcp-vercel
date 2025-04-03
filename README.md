@@ -15,12 +15,12 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 
 ### Current Tools
 
-- `vercel-create-environment-variables` - Create multiple environment variables
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
-- `vercel-get-environments` - Access project environment variables
 - `vercel-create-deployment` - Create new deployments
 - `vercel-create-project` - Create new Vercel projects
+- `vercel-create-environment-variables` - Create multiple environment variables
+- `vercel-get-environments` - Access project environment variables 
 - `vercel-list-projects` - List all projects with pagination
 - `vercel-list-all-teams` - List all accessible teams
 
