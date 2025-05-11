@@ -11,6 +11,11 @@ import type {
   ListProjectsResponse,
 } from "./types.js";
 
+/**
+ * Create environment variables for a project
+ * @param params - The parameters for creating environment variables
+ * @returns The response from the API
+ */
 export async function handleCreateEnvironmentVariables(params: any = {}) {
   try {
     const { projectId, teamId, environmentVariables } =
@@ -54,6 +59,11 @@ export async function handleCreateEnvironmentVariables(params: any = {}) {
   }
 }
 
+/**
+ * List projects
+ * @param params - The parameters for listing projects
+ * @returns The response from the API
+ */
 export async function handleListProjects(params: any = {}) {
   try {
     const { limit, from, teamId } = ListProjectsArgumentsSchema.parse(params);
@@ -95,6 +105,11 @@ export async function handleListProjects(params: any = {}) {
   }
 }
 
+/**
+ * Create a project
+ * @param params - The parameters for creating a project
+ * @returns The response from the API
+ */
 export async function handleCreateProject(params: any = {}) {
   try {
     const {
