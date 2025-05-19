@@ -17,7 +17,7 @@ import {
   handleListProjects,
 } from "./tools/projects/handlers.js";
 import { handleGetEnvironments } from "./tools/environments/handlers.js";
-import { handleListTeams } from "./tools/teams/handlers.js";
+import { handleListTeams, handleCreateTeam } from "./tools/teams/handlers.js";
 
 const server = new Server(
   {
@@ -55,6 +55,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleCreateProject(args);
       case "vercel-list-all-teams":
         return await handleListTeams(args);
+      case "vercel-create-team":
+        return await handleCreateTeam(args);
       case "vercel-create-environment-variables":
         return await handleCreateEnvironmentVariables(args);
       case "vercel-list-projects":

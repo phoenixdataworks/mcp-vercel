@@ -16,3 +16,9 @@ export interface TeamsResponse {
     prev: number | null;
   };
 }
+
+export interface CreateTeamResponse {
+  id: string;
+  slug: string;
+  billing: Record<string, any>;
+}

@@ -66,27 +66,47 @@ export async function handleCreateEnvironmentVariables(params: any = {}) {
  */
 export async function handleListProjects(params: any = {}) {
   try {
-    const { limit, from, teamId } = ListProjectsArgumentsSchema.parse(params);
+    const { limit, from, teamId, search, repoUrl, gitForkProtection } = 
+      ListProjectsArgumentsSchema.parse(params);
 
-    const url = new URL("v10/projects", VERCEL_API);
+    // Build the query URL with parameters
+    let endpoint = "v9/projects";
     const queryParams = new URLSearchParams();
 
     if (limit) queryParams.append("limit", limit.toString());
     if (from) queryParams.append("from", from.toString());
     if (teamId) queryParams.append("teamId", teamId);
+    if (search) queryParams.append("search", search);
+    if (repoUrl) queryParams.append("repoUrl", repoUrl);
+    if (gitForkProtection) queryParams.append("gitForkProtection", gitForkProtection);
 
-    const fullUrl = `${url}?${queryParams.toString()}`;
-    const data = await vercelFetch<ListProjectsResponse>(fullUrl);
+    if (queryParams.toString()) {
+      endpoint += `?${queryParams.toString()}`;
+    }
+
+    const data = await vercelFetch<ListProjectsResponse>(endpoint);
+
+    if (!data || !data.projects) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "No projects found or invalid response from API",
+            isError: true
+          }
+        ]
+      };
+    }
 
     return {
       content: [
         {
           type: "text",
-          text: `Found ${data?.projects.length} projects`,
+          text: `Found ${data.projects.length} projects`,
         },
         {
           type: "text",
-          text: JSON.stringify(data, null, 2),
+          text: JSON.stringify(data.projects, null, 2),
         },
       ],
     };

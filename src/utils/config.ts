@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
 export function getVercelApiToken(): string {
   const vercelApiToken = process.env.VERCEL_API_TOKEN;
   if (!vercelApiToken) {

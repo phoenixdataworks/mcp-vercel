@@ -68,38 +68,220 @@ export const VERCEL_GET_DEPLOYMENT_TOOL: Tool = {
 
 export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
   name: "vercel-create-deployment",
-  description: "Create a new Vercel deployment",
+  description: "Create a new Vercel deployment with the v13/deployments API",
   inputSchema: {
     type: "object",
     properties: {
+      // Identification parameters
       name: {
         type: "string",
         description: "Name of the deployment/project",
       },
       project: {
         type: "string",
-        description: "Project ID or name",
+        description: "Project ID or name (required unless deploymentId is provided)",
       },
+      deploymentId: {
+        type: "string",
+        description: "ID of a previous deployment to redeploy (required unless project is provided)",
+      },
+      slug: {
+        type: "string",
+        description: "A unique URL-friendly identifier",
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID for scoping",
+      },
+      customEnvironmentSlugOrId: {
+        type: "string",
+        description: "Custom environment slug or ID",
+      },
+      
+      // Configuration parameters
       target: {
         type: "string",
-        description: "Deployment target environment (production, preview)",
-        enum: ["production", "preview"],
+        description: "Deployment target environment",
+        enum: ["production", "preview", "development"],
+        default: "production"
       },
       regions: {
         type: "array",
         items: { type: "string" },
         description: "Regions to deploy to",
       },
-      teamId: {
-        type: "string",
-        description: "Team ID for scoping",
+      functions: {
+        type: "object",
+        description: "Serverless functions configuration"
       },
+      routes: {
+        type: "array",
+        description: "Array of route definitions"
+      },
+      cleanUrls: {
+        type: "boolean",
+        description: "Enable or disable Clean URLs"
+      },
+      trailingSlash: {
+        type: "boolean",
+        description: "Enable or disable trailing slashes"
+      },
+      public: {
+        type: "boolean",
+        description: "Make the deployment public"
+      },
+      ignoreCommand: {
+        type: "string",
+        description: "Command to check whether files should be ignored"
+      },
+      
+      // Source control parameters
+      gitSource: {
+        type: "object",
+        description: "Git source information",
+        properties: {
+          type: {
+            type: "string",
+            enum: ["github", "gitlab", "bitbucket"],
+            description: "Git provider type"
+          },
+          repoId: {
+            type: ["string", "number"],
+            description: "Repository ID"
+          },
+          ref: {
+            type: "string",
+            description: "Git reference (branch/tag)"
+          },
+          sha: {
+            type: "string",
+            description: "Git commit SHA"
+          }
+        }
+      },
+      gitMetadata: {
+        type: "object",
+        description: "Git metadata for the deployment",
+        properties: {
+          commitAuthorName: {
+            type: "string",
+            description: "Commit author name"
+          },
+          commitMessage: {
+            type: "string",
+            description: "Commit message"
+          },
+          commitRef: {
+            type: "string",
+            description: "Commit reference"
+          },
+          commitSha: {
+            type: "string",
+            description: "Commit SHA"
+          },
+          remoteUrl: {
+            type: "string",
+            description: "Git remote URL"
+          },
+          dirty: {
+            type: "boolean",
+            description: "Indicates if the working directory has uncommitted changes"
+          }
+        }
+      },
+      projectSettings: {
+        type: "object",
+        description: "Project-specific settings",
+        properties: {
+          buildCommand: {
+            type: "string",
+            description: "Custom build command"
+          },
+          devCommand: {
+            type: "string",
+            description: "Custom development command"
+          },
+          installCommand: {
+            type: "string",
+            description: "Custom install command"
+          },
+          outputDirectory: {
+            type: "string",
+            description: "Directory where build output is located"
+          },
+          rootDirectory: {
+            type: "string",
+            description: "Directory where the project is located"
+          },
+          framework: {
+            type: "string",
+            description: "Framework preset"
+          },
+          nodeVersion: {
+            type: "string",
+            description: "Node.js version"
+          },
+          serverlessFunctionRegion: {
+            type: "string",
+            description: "Region for serverless functions"
+          },
+          skipGitConnectDuringLink: {
+            type: "boolean",
+            description: "Skip Git connection during project link"
+          }
+        }
+      },
+      meta: {
+        type: "object",
+        description: "Additional metadata for the deployment"
+      },
+      monorepoManager: {
+        type: "string",
+        description: "Monorepo manager (e.g., turborepo, nx)"
+      },
+      
+      // File upload (for non-git deployments)
+      files: {
+        type: "array",
+        description: "Files to deploy (for non-git deployments)",
+        items: {
+          type: "object",
+          properties: {
+            file: {
+              type: "string",
+              description: "File path"
+            },
+            data: {
+              type: "string",
+              description: "File content"
+            },
+            encoding: {
+              type: "string",
+              enum: ["base64", "utf-8"],
+              description: "File content encoding"
+            }
+          }
+        }
+      },
+      
+      // Other flags
       forceNew: {
         type: "boolean",
         description: "Force new deployment even if identical exists",
       },
+      withCache: {
+        type: "boolean",
+        description: "Enable or disable build cache"
+      },
+      autoAssignCustomDomains: {
+        type: "boolean",
+        description: "Automatically assign custom domains to the deployment"
+      },
+      withLatestCommit: {
+        type: "boolean",
+        description: "Include the latest commit in the deployment"
+      }
     },
-    required: ["name", "project"],
   },
 };
 
@@ -128,6 +310,25 @@ export const VERCEL_LIST_TEAMS_TOOL: Tool = {
         description: "Team ID to scope the request",
       },
     },
+  },
+};
+
+export const VERCEL_CREATE_TEAM_TOOL: Tool = {
+  name: "vercel-create-team",
+  description: "Create a new Vercel team",
+  inputSchema: {
+    type: "object",
+    properties: {
+      slug: {
+        type: "string",
+        description: "A unique identifier for the team",
+      },
+      name: {
+        type: "string",
+        description: "A display name for the team",
+      },
+    },
+    required: ["slug"],
   },
 };
 
@@ -196,17 +397,26 @@ export const VERCEL_LIST_PROJECTS_TOOL: Tool = {
         type: "number",
         description: "Maximum number of projects to return"
       },
-      since: {
+      from: {
         type: "number",
-        description: "Timestamp in milliseconds to get projects created after this time"
-      },
-      until: {
-        type: "number",
-        description: "Timestamp in milliseconds to get projects created before this time"
+        description: "Projects created/updated after this timestamp"
       },
       teamId: {
         type: "string",
         description: "Team ID for request scoping"
+      },
+      search: {
+        type: "string",
+        description: "Search projects by name"
+      },
+      repoUrl: {
+        type: "string",
+        description: "Filter by repository URL"
+      },
+      gitForkProtection: {
+        type: "string",
+        enum: ["0", "1"],
+        description: "Specify PR authorization from forks (0/1)"
       }
     }
   }
@@ -273,6 +483,7 @@ export const VERCEL_TOOLS = [
   VERCEL_CREATE_DEPLOYMENT_TOOL,
   VERCEL_CREATE_PROJECT_TOOL,
   VERCEL_LIST_TEAMS_TOOL,
+  VERCEL_CREATE_TEAM_TOOL,
   VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL,
   VERCEL_LIST_PROJECTS_TOOL,
 ] as const;

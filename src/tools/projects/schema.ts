@@ -29,7 +29,10 @@ export const CreateProjectArgumentsSchema = z.object({
 });
 
 export const ListProjectsArgumentsSchema = z.object({
-  limit: z.number().int().positive().optional(),
-  from: z.number().int().optional(),
-  teamId: z.string().optional(),
+  limit: z.number().int().positive().optional().describe("Number of projects to return"),
+  from: z.number().int().optional().describe("Projects created/updated after this timestamp"),
+  teamId: z.string().optional().describe("Team ID for request scoping"),
+  search: z.string().optional().describe("Search projects by name"),
+  repoUrl: z.string().optional().describe("Filter by repository URL"),
+  gitForkProtection: z.enum(["0", "1"]).optional().describe("Specify PR authorization from forks (0/1)"),
 });

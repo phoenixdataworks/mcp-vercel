@@ -2,13 +2,14 @@
 
 A Model Context Protocol (MCP) integration for Vercel's REST API, providing programmatic access to Vercel deployment management.
 
-## 📋 Overview <sub><sup>Last updated: July 2024</sup></sub>
+## 📋 Overview <sub><sup>Last updated: August 2024</sup></sub>
 
 This MCP server implements Vercel's core API endpoints as tools, enabling:
 
 - Deployment monitoring & management
 - Environment variable retrieval
 - Project deployment status tracking
+- Team creation and management
 - CI/CD pipeline integration
 
 ## ✨ Features
@@ -23,12 +24,13 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - `vercel-get-environments` - Access project environment variables
 - `vercel-list-projects` - List all projects with pagination
 - `vercel-list-all-teams` - List all accessible teams
+- `vercel-create-team` - Create a new team with custom slug and name
 
 ## 🛣️ Roadmap
 
 - [x] Deployment creation workflow
 - [x] Project management tools
-- [x] Team management integration
+- [x] Team management integration (List & Create teams)
 - [ ] Real-time deployment monitoring
 - [ ] Advanced error handling
 - [ ] Deployment metrics dashboard
@@ -58,16 +60,60 @@ Get detailed information about a specific deployment
 
 ### `vercel-create-deployment`
 
-Create a new Vercel deployment
+Create a new Vercel deployment using the v13/deployments API endpoint
 
 - **Inputs**:
-  - `name` (string): Deployment/project name (required)
-  - `project` (string): Project ID/name (required)
-  - `target` (string): Environment (production/preview)
-  - `regions` (string[]): Deployment regions
-  - `teamId` (string): Team ID for scoping
-  - `forceNew` (boolean): Force new deployment
-- **Returns**: Created deployment details with status URLs
+  - **Identification Parameters**:
+    - `name` (string): Deployment/project name
+    - `project` (string): Project ID/name (required unless deploymentId is provided)
+    - `deploymentId` (string): ID of a previous deployment to redeploy (required unless project is provided)
+    - `slug` (string): A unique URL-friendly identifier
+    - `teamId` (string): Team ID for scoping
+    - `customEnvironmentSlugOrId` (string): Custom environment slug or ID
+  - **Configuration Parameters**:
+    - `target` (string): Environment (production/preview/development, default: production)
+    - `regions` (string[]): Deployment regions
+    - `functions` (object): Serverless functions configuration
+    - `routes` (array): Array of route definitions
+    - `cleanUrls` (boolean): Enable or disable Clean URLs
+    - `trailingSlash` (boolean): Enable or disable trailing slashes
+    - `public` (boolean): Make the deployment public
+    - `ignoreCommand` (string): Command to check whether files should be ignored
+  - **Source Control Parameters**:
+    - `gitSource` (object): Git source information
+      - `type` (string): Git provider type (github/gitlab/bitbucket)
+      - `repoId` (string/number): Repository ID
+      - `ref` (string): Git reference (branch/tag)
+      - `sha` (string): Git commit SHA
+    - `gitMetadata` (object): Git metadata for the deployment
+      - `commitAuthorName` (string): Commit author name
+      - `commitMessage` (string): Commit message
+      - `commitRef` (string): Git reference
+      - `commitSha` (string): Commit SHA
+      - `remoteUrl` (string): Git remote URL
+      - `dirty` (boolean): If the working directory has uncommitted changes
+    - `projectSettings` (object): Project-specific settings
+      - `buildCommand` (string): Custom build command
+      - `devCommand` (string): Custom development command
+      - `framework` (string): Framework preset
+      - `installCommand` (string): Custom install command
+      - `outputDirectory` (string): Build output directory
+      - `rootDirectory` (string): Project root directory
+      - `nodeVersion` (string): Node.js version
+      - `serverlessFunctionRegion` (string): Region for serverless functions
+    - `meta` (object): Additional metadata for the deployment
+    - `monorepoManager` (string): Monorepo manager (turborepo, nx, etc.)
+  - **File Parameters (for non-git deployments)**:
+    - `files` (array): Files to deploy
+      - `file` (string): File path
+      - `data` (string): File content
+      - `encoding` (string): Content encoding (base64/utf-8)
+  - **Other Flags**:
+    - `forceNew` (boolean): Force new deployment even if identical exists
+    - `withCache` (boolean): Enable or disable build cache
+    - `autoAssignCustomDomains` (boolean): Automatically assign custom domains
+    - `withLatestCommit` (boolean): Include the latest commit in the deployment
+- **Returns**: Created deployment details with status URLs, build information, and access links
 
 ### `vercel-create-project`
 
@@ -110,20 +156,33 @@ List all teams accessible to authenticated user
   - `teamId` (string): Team ID for request scoping
 - **Returns**: Paginated list of team objects with metadata
 
+### `vercel-create-team`
+
+Create a new Vercel team
+
+- **Inputs**:
+  - `slug` (string): A unique identifier for the team (required)
+  - `name` (string): A display name for the team (optional)
+- **Returns**: Created team details including ID, slug, and billing information
+
 ### `vercel-list-projects`
 
 List all projects under the authenticated user or team
 
 - **Inputs**:
   - `limit` (number): Maximum number of projects to return
-  - `from` (number): Timestamp for projects created
+  - `from` (number): Timestamp for projects created/updated after this time
   - `teamId` (string): Team ID for request scoping
-- **Returns**: Paginated list of project objects with metadata including:
+  - `search` (string): Search projects by name
+  - `repoUrl` (string): Filter by repository URL
+  - `gitForkProtection` (string): Specify PR authorization from forks (0/1)
+- **Returns**: List of project objects with metadata including:
   - `id`: Project ID
   - `name`: Project name
   - `framework`: Associated framework
   - `latestDeployments`: Array of recent deployments
   - `createdAt`: Creation timestamp
+  - Additional properties like targets, accountId, etc.
 
 ## 🚀 Getting Started
 
@@ -176,6 +235,92 @@ const deployment = await mcpClient.callTool({
   name: "vercel-get-deployment",
   args: {
     idOrUrl: "dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd",
+  },
+});
+```
+
+### List Projects
+
+```javascript
+const projects = await mcpClient.callTool({
+  name: "vercel-list-projects",
+  args: {
+    limit: 10,
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l", // Optional
+    search: "my-app" // Optional
+  },
+});
+```
+
+### Create a Deployment
+
+```javascript
+// Create a basic deployment
+const basicDeployment = await mcpClient.callTool({
+  name: "vercel-create-deployment",
+  args: {
+    project: "my-project-id",
+    target: "production",
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l" // Optional
+  }
+});
+
+// Redeploy an existing deployment
+const redeployment = await mcpClient.callTool({
+  name: "vercel-create-deployment",
+  args: {
+    deploymentId: "dpl_123abc456def"
+  }
+});
+
+// Create a deployment with Git source (from GitHub)
+const gitDeployment = await mcpClient.callTool({
+  name: "vercel-create-deployment",
+  args: {
+    project: "my-project-id",
+    gitSource: {
+      type: "github",
+      ref: "main"
+    },
+    gitMetadata: {
+      commitMessage: "add method to measure Interaction to Next Paint",
+      commitAuthorName: "developer",
+      remoteUrl: "https://github.com/vercel/next.js"
+    }
+  }
+});
+
+// Create a deployment with custom files
+const fileDeployment = await mcpClient.callTool({
+  name: "vercel-create-deployment",
+  args: {
+    name: "my-instant-deployment",
+    project: "my-deployment-project",
+    files: [
+      {
+        file: "index.html",
+        data: "PGgxPkhlbGxvIFdvcmxkPC9oMT4=", // Base64 encoded <h1>Hello World</h1>
+        encoding: "base64"
+      }
+    ],
+    projectSettings: {
+      framework: "nextjs",
+      buildCommand: "next build",
+      installCommand: "npm install",
+      nodeVersion: "18.x"
+    }
+  }
+});
+```
+
+### Create a New Team
+
+```javascript
+const team = await mcpClient.callTool({
+  name: "vercel-create-team",
+  args: {
+    slug: "my-awesome-team",
+    name: "My Awesome Team"
   },
 });
 ```

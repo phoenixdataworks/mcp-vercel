@@ -31,39 +31,77 @@ export async function handleGetDeployment(params: any = {}) {
   }
 }
 
+/**
+ * Creates a new deployment
+ * @param params The parameters for creating a deployment
+ * @returns Deployment details
+ */
+/**
+ * Create a new Vercel deployment using the v13/deployments API
+ * @param params The parameters for creating a deployment
+ * @returns The details of the created deployment
+ */
 export async function handleCreateDeployment(params: any = {}) {
   try {
-    const { name, project, target, regions, teamId, forceNew } =
-      CreateDeploymentArgumentsSchema.parse(params);
+    // Log the received parameters for debugging (noted in the server logs)
+    console.log("Received deployment params:", JSON.stringify(params));
 
-    const url = `v13/deployments${teamId ? `?teamId=${teamId}` : ""}`;
+    // Validation and cleaning of parameters
+    const validatedParams = CreateDeploymentArgumentsSchema.parse(params);
+    console.log("Validated params:", JSON.stringify(validatedParams));
 
-    const deploymentData = {
-      name,
-      project,
-      target: target || "production",
-      ...(regions && { regions }),
-      ...(forceNew && { forceNew: 1 }),
-    };
+    // Extraction of URL parameters (teamId is a URL parameter, not a body parameter)
+    let endpoint = "v13/deployments";
+    const queryParams = new URLSearchParams();
 
-    const data = await vercelFetch<Deployment>(url, {
+    // Handling of the teamId parameter
+    if (validatedParams.teamId) {
+      queryParams.append("teamId", validatedParams.teamId);
+      // Remove teamId from the body request
+      delete validatedParams.teamId;
+    }
+
+    // Construction of the URL with parameters
+    if (queryParams.toString()) {
+      endpoint += `?${queryParams.toString()}`;
+    }
+
+    // Preparation of the body request by removing undefined/null values
+    const deploymentData: Record<string, any> = {};
+    Object.entries(validatedParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        deploymentData[key] = value;
+      }
+    });
+
+    // Make the API request
+    const data = await vercelFetch<Deployment>(endpoint, {
       method: "POST",
       body: JSON.stringify(deploymentData),
     });
 
     if (!data) {
       return {
-        content: [{ type: "text", text: "Failed to create deployment" }],
+        content: [
+          {
+            type: "text",
+            text: "Failed to create deployment",
+            isError: true,
+          },
+        ],
       };
     }
 
+    // Return successful deployment response
     return {
       content: [
         {
           type: "text",
-          text:
-            `Deployment created successfully: ${data.url}\n` +
-            JSON.stringify(data, null, 2),
+          text: `Deployment created successfully: ${data.url}`,
+        },
+        {
+          type: "text",
+          text: JSON.stringify(data, null, 2),
         },
       ],
     };
