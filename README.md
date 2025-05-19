@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) integration for Vercel's REST API, providing programmatic access to Vercel deployment management through AI Assistants like Claude and Cursor.
 
-## 📋 Overview <sub><sup>Last updated: August 2024</sup></sub>
+## 📋 Overview <sub><sup>Last updated: May 2025</sup></sub>
 
 This MCP server implements Vercel's core API endpoints as tools, enabling:
 
@@ -267,18 +267,18 @@ Cursor has built-in support for MCP tools through its extension system.
 You can also use the Model Context Protocol SDK to integrate with the server programmatically in your own applications:
 
 ```javascript
-import { Client } from '@modelcontextprotocol/sdk/client';
+import { Client } from "@modelcontextprotocol/sdk/client";
 
 // Create an MCP client connected to a stdio transport
 const client = new Client({
-  transport: 'stdio',
-  cmd: 'npm --prefix /path/to/vercel-mcp start',
+  transport: "stdio",
+  cmd: "npm --prefix /path/to/vercel-mcp start",
 });
 
 // Or connect to an HTTP transport
 const httpClient = new Client({
-  transport: 'http',
-  url: 'http://localhost:3399',
+  transport: "http",
+  url: "http://localhost:3399",
 });
 
 // Connect to the server
@@ -286,22 +286,25 @@ await client.connect();
 
 // List available tools
 const { tools } = await client.listTools();
-console.log('Available tools:', tools.map(t => t.name));
+console.log(
+  "Available tools:",
+  tools.map((t) => t.name)
+);
 
 // Call a tool
 const result = await client.callTool({
-  name: 'vercel-list-all-deployments',
-  args: { limit: 5 }
+  name: "vercel-list-all-deployments",
+  args: { limit: 5 },
 });
 
-console.log('Deployments:', result);
+console.log("Deployments:", result);
 
 // You can also use this in an Express server:
-app.post('/api/deployments', async (req, res) => {
+app.post("/api/deployments", async (req, res) => {
   try {
     const result = await client.callTool({
-      name: 'vercel-list-all-deployments',
-      args: req.body
+      name: "vercel-list-all-deployments",
+      args: req.body,
     });
     res.json(result);
   } catch (error) {
@@ -342,7 +345,7 @@ const files = await mcpClient.callTool({
   name: "vercel-list-deployment-files",
   args: {
     id: "dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd",
-    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l" // Optional
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l", // Optional
   },
 });
 ```
@@ -355,7 +358,7 @@ const projects = await mcpClient.callTool({
   args: {
     limit: 10,
     teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l", // Optional
-    search: "my-app" // Optional
+    search: "my-app", // Optional
   },
 });
 ```
@@ -369,16 +372,16 @@ const basicDeployment = await mcpClient.callTool({
   args: {
     project: "my-project-id",
     target: "production",
-    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l" // Optional
-  }
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l", // Optional
+  },
 });
 
 // Redeploy an existing deployment
 const redeployment = await mcpClient.callTool({
   name: "vercel-create-deployment",
   args: {
-    deploymentId: "dpl_123abc456def"
-  }
+    deploymentId: "dpl_123abc456def",
+  },
 });
 
 // Create a deployment with Git source (from GitHub)
@@ -388,14 +391,14 @@ const gitDeployment = await mcpClient.callTool({
     project: "my-project-id",
     gitSource: {
       type: "github",
-      ref: "main"
+      ref: "main",
     },
     gitMetadata: {
       commitMessage: "add method to measure Interaction to Next Paint",
       commitAuthorName: "developer",
-      remoteUrl: "https://github.com/vercel/next.js"
-    }
-  }
+      remoteUrl: "https://github.com/vercel/next.js",
+    },
+  },
 });
 
 // Create a deployment with custom files
@@ -408,16 +411,16 @@ const fileDeployment = await mcpClient.callTool({
       {
         file: "index.html",
         data: "PGgxPkhlbGxvIFdvcmxkPC9oMT4=", // Base64 encoded <h1>Hello World</h1>
-        encoding: "base64"
-      }
+        encoding: "base64",
+      },
     ],
     projectSettings: {
       framework: "nextjs",
       buildCommand: "next build",
       installCommand: "npm install",
-      nodeVersion: "18.x"
-    }
-  }
+      nodeVersion: "18.x",
+    },
+  },
 });
 ```
 
@@ -428,7 +431,7 @@ const team = await mcpClient.callTool({
   name: "vercel-create-team",
   args: {
     slug: "my-awesome-team",
-    name: "My Awesome Team"
+    name: "My Awesome Team",
   },
 });
 ```
