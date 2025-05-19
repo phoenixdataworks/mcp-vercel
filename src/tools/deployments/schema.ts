@@ -14,6 +14,12 @@ export const GetDeploymentArgumentsSchema = z.object({
   teamId: z.string().optional(),
 });
 
+export const ListDeploymentFilesArgumentsSchema = z.object({
+  id: z.string().describe("The unique deployment identifier"),
+  teamId: z.string().optional().describe("Team identifier to perform the request on behalf of"),
+  slug: z.string().optional().describe("Team slug to perform the request on behalf of"),
+});
+
 export const GitSourceSchema = z.object({
   type: z.literal("github").or(z.literal("gitlab").or(z.literal("bitbucket"))),
   repoId: z.number().or(z.string()).optional(),

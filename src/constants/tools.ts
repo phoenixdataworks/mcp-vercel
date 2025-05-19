@@ -66,6 +66,29 @@ export const VERCEL_GET_DEPLOYMENT_TOOL: Tool = {
   },
 };
 
+export const VERCEL_LIST_DEPLOYMENT_FILES_TOOL: Tool = {
+  name: "vercel-list-deployment-files",
+  description: "List all files of a Vercel deployment",
+  inputSchema: {
+    type: "object",
+    properties: {
+      id: {
+        type: "string",
+        description: "The unique deployment identifier",
+      },
+      teamId: {
+        type: "string",
+        description: "Team identifier to perform the request on behalf of",
+      },
+      slug: {
+        type: "string",
+        description: "Team slug to perform the request on behalf of",
+      },
+    },
+    required: ["id"],
+  },
+};
+
 export const VERCEL_CREATE_DEPLOYMENT_TOOL: Tool = {
   name: "vercel-create-deployment",
   description: "Create a new Vercel deployment with the v13/deployments API",
@@ -480,6 +503,7 @@ export const VERCEL_TOOLS = [
   VERCEL_ALL_DEPLOYMENTS_TOOL,
   VERCEL_GET_ENVIRONMENTS_TOOL,
   VERCEL_GET_DEPLOYMENT_TOOL,
+  VERCEL_LIST_DEPLOYMENT_FILES_TOOL,
   VERCEL_CREATE_DEPLOYMENT_TOOL,
   VERCEL_CREATE_PROJECT_TOOL,
   VERCEL_LIST_TEAMS_TOOL,

@@ -1,9 +1,10 @@
 import { vercelFetch } from "../../utils/api.js";
-import type { Deployment, DeploymentsResponse } from "./types.js";
+import type { Deployment, DeploymentsResponse, DeploymentFilesResponse } from "./types.js";
 import {
   ListDeploymentsArgumentsSchema,
   GetDeploymentArgumentsSchema,
   CreateDeploymentArgumentsSchema,
+  ListDeploymentFilesArgumentsSchema,
 } from "./schema.js";
 
 export async function handleGetDeployment(params: any = {}) {
@@ -151,6 +152,66 @@ export async function handleAllDeployments(params: any = {}) {
   } catch (error) {
     return {
       content: [{ type: "text", text: `Error: ${error}` }],
+    };
+  }
+}
+
+/**
+ * List all files of a deployment
+ * @param params Parameters including deployment ID and optional team identifier
+ * @returns List of files in the deployment
+ */
+export async function handleListDeploymentFiles(params: any = {}) {
+  try {
+    const { id, teamId, slug } = ListDeploymentFilesArgumentsSchema.parse(params);
+
+    // Build the URL with optional query parameters
+    let url = `v6/deployments/${encodeURIComponent(id)}/files`;
+    const queryParams = new URLSearchParams();
+    
+    if (teamId) queryParams.append("teamId", teamId);
+    if (slug) queryParams.append("slug", slug);
+    
+    if (queryParams.toString()) {
+      url += `?${queryParams.toString()}`;
+    }
+
+    const data = await vercelFetch<DeploymentFilesResponse>(url);
+
+    if (!data || !data.files) {
+      return {
+        content: [{ 
+          type: "text", 
+          text: "Failed to retrieve deployment files or no files found",
+          isError: true
+        }],
+      };
+    }
+
+    // Return the files with formatting to make them easier to read
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${data.files.length} files in deployment ${id}`,
+        },
+        {
+          type: "text",
+          text: JSON.stringify(data.files, null, 2),
+        },
+      ],
+    };
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error listing deployment files: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+          isError: true,
+        },
+      ],
     };
   }
 }

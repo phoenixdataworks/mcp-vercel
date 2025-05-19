@@ -66,3 +66,18 @@ export interface Deployment {
 export interface DeploymentsResponse {
   deployments: Deployment[];
 }
+
+export interface DeploymentFile {
+  name: string;
+  type: string;
+  uid: string;
+  contentType: string;
+  mode: number;
+  size?: number;
+  symlink?: string;
+  children?: DeploymentFile[];
+}
+
+export interface DeploymentFilesResponse {
+  files: DeploymentFile[];
+}

@@ -10,6 +10,7 @@ import {
   handleAllDeployments,
   handleCreateDeployment,
   handleGetDeployment,
+  handleListDeploymentFiles,
 } from "./tools/deployments/handlers.js";
 import {
   handleCreateProject,
@@ -49,6 +50,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return await handleGetEnvironments(request.params as any);
       case "vercel-get-deployment":
         return await handleGetDeployment(args);
+      case "vercel-list-deployment-files":
+        return await handleListDeploymentFiles(args);
       case "vercel-create-deployment":
         return await handleCreateDeployment(args);
       case "vercel-create-project":

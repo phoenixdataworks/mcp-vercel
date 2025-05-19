@@ -1,6 +1,6 @@
 # Vercel MCP Integration
 
-A Model Context Protocol (MCP) integration for Vercel's REST API, providing programmatic access to Vercel deployment management.
+A Model Context Protocol (MCP) integration for Vercel's REST API, providing programmatic access to Vercel deployment management through AI Assistants like Claude and Cursor.
 
 ## 📋 Overview <sub><sup>Last updated: August 2024</sup></sub>
 
@@ -18,6 +18,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
+- `vercel-list-deployment-files` - List files in a deployment
 - `vercel-create-deployment` - Create new deployments
 - `vercel-create-project` - Create new Vercel projects
 - `vercel-create-environment-variables` - Create multiple environment variables
@@ -57,6 +58,16 @@ Get detailed information about a specific deployment
   - `idOrUrl` (string): Deployment ID or URL (required)
   - `teamId` (string): Team ID for request scoping
 - **Returns**: Full deployment details including build logs, domains, and environment variables
+
+### `vercel-list-deployment-files`
+
+List all files of a Vercel deployment
+
+- **Inputs**:
+  - `id` (string): The unique deployment identifier (required)
+  - `teamId` (string): Team identifier to perform the request on behalf of
+  - `slug` (string): Team slug to perform the request on behalf of
+- **Returns**: Array of file objects with properties like name, type, MIME content type, and file permissions
 
 ### `vercel-create-deployment`
 
@@ -190,7 +201,7 @@ List all projects under the authenticated user or team
 
 - Node.js 18+
 - Vercel API Token
-- MCP Client
+- MCP Client (Claude, Cursor, or other AI Assistants that support MCP)
 
 ### Installation
 
@@ -214,7 +225,92 @@ VERCEL_API_TOKEN=your_api_token_here
 npm start
 ```
 
-## 🛠️ Usage Examples
+## 🔗 Integrating with AI Assistants
+
+### Integrating with Claude
+
+Claude supports MCP tools via its Anthropic Console or Claude Code interface.
+
+1. Start the MCP server locally with `npm start`
+2. In Claude Code, use the `/connect` command:
+   ```
+   /connect mcp --path [path-to-server]
+   ```
+   For CLI-based servers using stdio, specify the path to the server executable
+3. Claude will automatically discover the available Vercel tools
+4. You can then ask Claude to perform Vercel operations, for example:
+   ```
+   Please list my recent Vercel deployments using the vercel-list-all-deployments tool
+   ```
+5. Alternatively, you can expose the MCP server as an HTTP server with a tool like `mcp-proxy`
+   ```bash
+   npm install -g @modelcontextprotocol/proxy
+   mcp-proxy --stdio --cmd "npm start" --port 3399
+   ```
+   Then connect in Claude: `/connect mcp --url http://localhost:3399`
+
+### Integrating with Cursor
+
+Cursor has built-in support for MCP tools through its extension system.
+
+1. Start the MCP server with `npm start`
+2. In Cursor, access Settings → Tools
+3. Under "Model Context Protocol (MCP)", click "+ Add MCP tool"
+4. Configure a new connection:
+   - For stdio transport: Point to the executable path
+   - For HTTP transport: Specify the URL (e.g., http://localhost:3399)
+5. Cursor will automatically discover the available Vercel tools
+6. Use Cursor's AI features to interact with your Vercel deployments by mentioning the tools in your prompts
+
+### Programmatic Integration
+
+You can also use the Model Context Protocol SDK to integrate with the server programmatically in your own applications:
+
+```javascript
+import { Client } from '@modelcontextprotocol/sdk/client';
+
+// Create an MCP client connected to a stdio transport
+const client = new Client({
+  transport: 'stdio',
+  cmd: 'npm --prefix /path/to/vercel-mcp start',
+});
+
+// Or connect to an HTTP transport
+const httpClient = new Client({
+  transport: 'http',
+  url: 'http://localhost:3399',
+});
+
+// Connect to the server
+await client.connect();
+
+// List available tools
+const { tools } = await client.listTools();
+console.log('Available tools:', tools.map(t => t.name));
+
+// Call a tool
+const result = await client.callTool({
+  name: 'vercel-list-all-deployments',
+  args: { limit: 5 }
+});
+
+console.log('Deployments:', result);
+
+// You can also use this in an Express server:
+app.post('/api/deployments', async (req, res) => {
+  try {
+    const result = await client.callTool({
+      name: 'vercel-list-all-deployments',
+      args: req.body
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+## 🛠️ Tool Usage Examples
 
 ### List Deployments
 
@@ -235,6 +331,18 @@ const deployment = await mcpClient.callTool({
   name: "vercel-get-deployment",
   args: {
     idOrUrl: "dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd",
+  },
+});
+```
+
+### List Deployment Files
+
+```javascript
+const files = await mcpClient.callTool({
+  name: "vercel-list-deployment-files",
+  args: {
+    id: "dpl_5WJWYSyB7BpgTj3EuwF37WMRBXBtPQ2iTMJHJBJyRfd",
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l" // Optional
   },
 });
 ```
