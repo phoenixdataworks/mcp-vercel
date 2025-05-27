@@ -23,6 +23,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - `vercel-create-project` - Create new Vercel projects
 - `vercel-create-environment-variables` - Create multiple environment variables
 - `vercel-get-environments` - Access project environment variables
+- `vercel-create-custom-environment` - Create custom environments for projects
 - `vercel-list-projects` - List all projects with pagination
 - `vercel-list-all-teams` - List all accessible teams
 - `vercel-create-team` - Create a new team with custom slug and name
@@ -33,7 +34,7 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 - [x] Project management tools
 - [x] Team management integration (List & Create teams)
 - [ ] Real-time deployment monitoring
-- [ ] Advanced error handling
+- [x] Advanced error handling
 - [ ] Deployment metrics dashboard
 
 ## Tools
@@ -155,6 +156,21 @@ Create multiple environment variables for a project
     - `gitBranch` (string): Optional git branch for variable
 
 - **Returns**: Object with created variables and any skipped entries
+
+### `vercel-create-custom-environment`
+
+Create a custom environment for a Vercel project. Custom environments cannot be named 'Production' or 'Preview'.
+
+- **Inputs**:
+  - `idOrName` (string): The unique project identifier or project name (required)
+  - `name` (string): Name for the custom environment (required, cannot be 'Production' or 'Preview')
+  - `description` (string): Description of the custom environment
+  - `branchMatcher` (object): Branch matching configuration
+    - `type` (string): Type of branch matching (startsWith/endsWith/contains/exactMatch/regex)
+    - `pattern` (string): Pattern to match branches against
+  - `teamId` (string): Team ID to perform the request on behalf of
+  - `slug` (string): Team slug to perform the request on behalf of
+- **Returns**: Created custom environment details including ID, slug, type, description, branch matcher configuration, and domains
 
 ### `vercel-list-all-teams`
 
@@ -432,6 +448,24 @@ const team = await mcpClient.callTool({
   args: {
     slug: "my-awesome-team",
     name: "My Awesome Team",
+  },
+});
+```
+
+### Create a Custom Environment
+
+```javascript
+const customEnv = await mcpClient.callTool({
+  name: "vercel-create-custom-environment",
+  args: {
+    idOrName: "my-project-id",
+    name: "staging",
+    description: "Staging environment for QA testing",
+    branchMatcher: {
+      type: "startsWith",
+      pattern: "staging/",
+    },
+    teamId: "team_1a2b3c4d5e6f7g8h9i0j1k2l", // Optional
   },
 });
 ```

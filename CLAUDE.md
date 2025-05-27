@@ -2,6 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Commit Guidelines
+
+When creating git commits:
+- Always use "Franck <franck@nganiet.com>" as the commit author
+- Never include any mention of Claude Code or AI generation in commit messages
+- Write commit messages as if they were written by a human developer
+
 ## Repository Overview
 
 This is a Model Context Protocol (MCP) integration for Vercel's REST API. It implements tools for interacting with Vercel's APIs, enabling LLMs and other applications to programmatically manage Vercel deployments, projects, teams and environment variables.

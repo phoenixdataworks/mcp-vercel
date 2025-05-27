@@ -499,6 +499,52 @@ export const VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL: Tool = {
   },
 };
 
+export const VERCEL_CREATE_CUSTOM_ENVIRONMENT_TOOL: Tool = {
+  name: "vercel-create-custom-environment",
+  description: "Create a custom environment for a Vercel project. Note: Cannot be named 'Production' or 'Preview'",
+  inputSchema: {
+    type: "object",
+    properties: {
+      idOrName: {
+        type: "string",
+        description: "The unique project identifier or project name",
+      },
+      name: {
+        type: "string",
+        description: "Name for the custom environment (cannot be 'Production' or 'Preview')",
+      },
+      description: {
+        type: "string",
+        description: "Description of the custom environment",
+      },
+      branchMatcher: {
+        type: "object",
+        description: "Branch matching configuration for the custom environment",
+        properties: {
+          type: {
+            type: "string",
+            enum: ["startsWith", "endsWith", "contains", "exactMatch", "regex"],
+            description: "Type of branch matching"
+          },
+          pattern: {
+            type: "string",
+            description: "Pattern to match branches against"
+          }
+        }
+      },
+      teamId: {
+        type: "string",
+        description: "Team ID to perform the request on behalf of",
+      },
+      slug: {
+        type: "string",
+        description: "Team slug to perform the request on behalf of",
+      },
+    },
+    required: ["idOrName", "name"],
+  },
+};
+
 export const VERCEL_TOOLS = [
   VERCEL_ALL_DEPLOYMENTS_TOOL,
   VERCEL_GET_ENVIRONMENTS_TOOL,
@@ -509,5 +555,6 @@ export const VERCEL_TOOLS = [
   VERCEL_LIST_TEAMS_TOOL,
   VERCEL_CREATE_TEAM_TOOL,
   VERCEL_CREATE_ENVIRONMENT_VARIABLES_TOOL,
+  VERCEL_CREATE_CUSTOM_ENVIRONMENT_TOOL,
   VERCEL_LIST_PROJECTS_TOOL,
 ] as const;

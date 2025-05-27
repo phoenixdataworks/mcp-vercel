@@ -1,5 +1,6 @@
 import { vercelFetch } from "../../utils/api.js";
-import { GetEnvironmentsParams } from "./type.js";
+import { GetEnvironmentsParams, CustomEnvironmentResponse } from "./type.js";
+import { CreateCustomEnvironmentSchema } from "./schema.js";
 
 /**
  * Retrieves environment variables for a Vercel project specified by ID or name
@@ -76,6 +77,107 @@ export async function handleGetEnvironments(params: GetEnvironmentsParams) {
         {
           type: "text",
           text: `Error retrieving environment variables: ${errorMsg}`,
+        },
+      ],
+    };
+  }
+}
+
+/**
+ * Creates a custom environment for a Vercel project
+ * @param params - Parameters containing the project ID/name and environment configuration
+ * @returns A formatted response containing the created custom environment or an error message
+ */
+export async function handleCreateCustomEnvironment(params: any) {
+  try {
+    // Validate input parameters
+    const validationResult = CreateCustomEnvironmentSchema.safeParse(params);
+    
+    if (!validationResult.success) {
+      const errorMsg = `Invalid request: ${validationResult.error.issues.map(issue => issue.message).join(", ")}`;
+      console.error(errorMsg);
+      return {
+        content: [{ type: "text", text: errorMsg }],
+      };
+    }
+
+    const { idOrName, name, description, branchMatcher, teamId, slug } = validationResult.data;
+
+    console.log(`Creating custom environment '${name}' for project: ${idOrName}`);
+
+    // Build request body
+    const requestBody: any = {
+      name,
+    };
+
+    if (description) {
+      requestBody.description = description;
+    }
+
+    if (branchMatcher) {
+      requestBody.branchMatcher = branchMatcher;
+    }
+
+    // Build query parameters
+    const queryParams = new URLSearchParams();
+    if (teamId) {
+      queryParams.append("teamId", teamId);
+    }
+    if (slug) {
+      queryParams.append("slug", slug);
+    }
+
+    const queryString = queryParams.toString();
+    const endpoint = `v9/projects/${encodeURIComponent(idOrName)}/custom-environments${queryString ? `?${queryString}` : ""}`;
+
+    // Call Vercel API v9
+    const data = await vercelFetch<CustomEnvironmentResponse>(
+      endpoint,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    // Validate response
+    if (!data || !data.id) {
+      const errorMsg = `Failed to create custom environment for project: ${idOrName}`;
+      console.error(errorMsg, { data });
+      return {
+        content: [{ type: "text", text: errorMsg }],
+      };
+    }
+
+    // Format successful response
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Successfully created custom environment '${name}' for project: ${idOrName}`,
+        },
+        {
+          type: "text",
+          text: JSON.stringify(data, null, 2),
+        },
+      ],
+    };
+  } catch (error) {
+    // Handle errors
+    const errorMsg =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+
+    console.error("Error creating custom environment:", error);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error creating custom environment: ${errorMsg}`,
         },
       ],
     };
