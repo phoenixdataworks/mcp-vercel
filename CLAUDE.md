@@ -2,13 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Git Commit Guidelines
-
-When creating git commits:
-- Always use "Franck <franck@nganiet.com>" as the commit author
-- Never include any mention of Claude Code or AI generation in commit messages
-- Write commit messages as if they were written by a human developer
-
 ## Repository Overview
 
 This is a Model Context Protocol (MCP) integration for Vercel's REST API. It implements tools for interacting with Vercel's APIs, enabling LLMs and other applications to programmatically manage Vercel deployments, projects, teams and environment variables.
@@ -60,20 +53,24 @@ docker run -it --rm \
 
 This project is built as a Model Context Protocol (MCP) server that implements a set of tools for interacting with the Vercel API. Key components include:
 
-1. **Server Initialization (`src/index.ts`)**: 
+1. **Server Initialization (`src/index.ts`)**:
+
    - Entry point that creates an MCP server instance
    - Registers tool handlers and configures error handling
 
-2. **Tools Definition (`src/constants/tools.ts`)**: 
+2. **Tools Definition (`src/constants/tools.ts`)**:
+
    - Defines the schemas and descriptions for all available tools
    - Each tool has a defined name, description, and input schema
 
 3. **Tool Handlers (src/tools/<domain>/handlers.ts)**:
+
    - Implements the actual tool functionality
    - Four main domains: deployments, environments, projects, and teams
    - Each handler validates inputs, makes API calls, and formats responses
 
 4. **API Utilities (`src/utils/api.ts` & `src/utils/config.ts`)**:
+
    - Handles authentication and API requests to Vercel
    - Configures API endpoints and tokens
 
@@ -82,6 +79,7 @@ This project is built as a Model Context Protocol (MCP) server that implements a
    - Ensures type safety throughout the application
 
 The application follows a modular architecture where:
+
 - Each Vercel API domain has its own directory with handlers, schemas, and types
 - The server routes tool calls to the appropriate handler based on the tool name
 - All handlers use a common API utility for making authenticated requests to Vercel
@@ -94,6 +92,7 @@ The application follows a modular architecture where:
 4. Test the tool functionality with an MCP client
 
 When adding a new tool, follow the pattern established in existing tools:
+
 1. Create a schema definition using Zod
 2. Implement a handler function that validates inputs and calls the Vercel API
 3. Define types for request parameters and response data
