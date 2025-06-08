@@ -14,19 +14,37 @@ This MCP server implements Vercel's core API endpoints as tools, enabling:
 
 ## ✨ Features
 
-### Current Tools
+### Current Tools (20 Total)
 
+**📦 Deployments (4 tools)**
 - `vercel-list-all-deployments` - List deployments with filtering
 - `vercel-get-deployment` - Retrieve specific deployment details
 - `vercel-list-deployment-files` - List files in a deployment
 - `vercel-create-deployment` - Create new deployments
+
+**🏗️ Projects (3 tools)**
 - `vercel-create-project` - Create new Vercel projects
 - `vercel-create-environment-variables` - Create multiple environment variables
+- `vercel-list-projects` - List all projects with pagination
+
+**🌐 Environments (2 tools)**
 - `vercel-get-environments` - Access project environment variables
 - `vercel-create-custom-environment` - Create custom environments for projects
-- `vercel-list-projects` - List all projects with pagination
+
+**👥 Teams (2 tools)**
 - `vercel-list-all-teams` - List all accessible teams
 - `vercel-create-team` - Create a new team with custom slug and name
+
+**🔍 Logging & Debugging (9 tools)**
+- `vercel-get-project-logs` - Runtime application logs with filtering
+- `vercel-get-deployment-logs` - Build and deployment logs
+- `vercel-get-function-logs` - Serverless function execution logs
+- `vercel-search-logs` - Full-text search across all logs
+- `vercel-get-log-drains` - List external log forwarding configurations
+- `vercel-create-log-drain` - Create log drains for external systems
+- `vercel-get-runtime-errors` - Production error reports and stack traces
+- `vercel-get-build-errors` - Build failure analysis and debugging
+- `vercel-debug-deployment` - Comprehensive deployment troubleshooting
 
 ## 🛣️ Roadmap
 
@@ -211,6 +229,120 @@ List all projects under the authenticated user or team
   - `createdAt`: Creation timestamp
   - Additional properties like targets, accountId, etc.
 
+## 🔍 Logging & Debugging Tools
+
+### `vercel-get-project-logs`
+
+Retrieve runtime application logs for a specific project
+
+- **Inputs**:
+  - `projectId` (string): Project ID (required)
+  - `since` (number): Timestamp to get logs from
+  - `until` (number): Timestamp to get logs until
+  - `limit` (number): Number of logs to return (1-1000, default: 100)
+  - `level` (string): Filter by log level (error/warning/info/debug)
+  - `source` (string): Filter by source (runtime/build/function/edge-function)
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Array of log entries with timestamps, levels, messages, and metadata
+
+### `vercel-get-deployment-logs`
+
+Get build and deployment logs for a specific deployment
+
+- **Inputs**:
+  - `deploymentId` (string): Deployment ID (required)
+  - `since` (number): Timestamp to get logs from
+  - `until` (number): Timestamp to get logs until
+  - `limit` (number): Number of logs to return (1-1000, default: 100)
+  - `follow` (boolean): Follow logs in real-time
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Array of build/deployment log entries with detailed build information
+
+### `vercel-get-function-logs`
+
+Retrieve serverless function execution logs with performance metrics
+
+- **Inputs**:
+  - `functionId` (string): Function ID (required)
+  - `deploymentId` (string): Deployment ID (optional)
+  - `since` (number): Timestamp to get logs from
+  - `until` (number): Timestamp to get logs until
+  - `limit` (number): Number of logs to return (1-1000, default: 100)
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Function logs with execution time, memory usage, and request/response data
+
+### `vercel-search-logs`
+
+Full-text search across all logs with advanced filtering
+
+- **Inputs**:
+  - `query` (string): Search query (required)
+  - `projectId` (string): Project ID (optional)
+  - `deploymentId` (string): Deployment ID (optional)
+  - `since` (number): Timestamp to search from
+  - `until` (number): Timestamp to search until
+  - `limit` (number): Number of results (1-1000, default: 100)
+  - `level` (string): Filter by log level
+  - `source` (string): Filter by source
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Matching log entries with search relevance scoring
+
+### `vercel-get-log-drains`
+
+List configured external log forwarding destinations
+
+- **Inputs**:
+  - `projectId` (string): Project ID (optional, lists all if not provided)
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Array of log drain configurations with destinations and formats
+
+### `vercel-create-log-drain`
+
+Create external log forwarding to services like DataDog, Splunk, etc.
+
+- **Inputs**:
+  - `name` (string): Log drain name (required)
+  - `projectId` (string): Project ID (required)
+  - `url` (string): Destination URL (required)
+  - `format` (string): Log format (json/ndjson/syslog, default: json)
+  - `headers` (object): Custom HTTP headers for log forwarding
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Created log drain configuration with webhook details
+
+### `vercel-get-runtime-errors`
+
+Get production error reports and stack traces
+
+- **Inputs**:
+  - `projectId` (string): Project ID (required)
+  - `deploymentId` (string): Deployment ID (optional)
+  - `since` (number): Timestamp to get errors from
+  - `until` (number): Timestamp to get errors until
+  - `limit` (number): Number of errors (1-100, default: 50)
+  - `status` (string): Filter by HTTP status code
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Array of error reports with stack traces, request context, and frequency
+
+### `vercel-get-build-errors`
+
+Analyze build failures and compilation errors
+
+- **Inputs**:
+  - `deploymentId` (string): Deployment ID (required)
+  - `projectId` (string): Project ID (optional)
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Build error details with compilation failures, dependency issues, and suggestions
+
+### `vercel-debug-deployment`
+
+Comprehensive deployment troubleshooting combining logs, errors, and metrics
+
+- **Inputs**:
+  - `deploymentId` (string): Deployment ID (required)
+  - `includeMetrics` (boolean): Include performance metrics (default: true)
+  - `teamId` (string): Team ID for scoping
+- **Returns**: Complete debugging report with deployment status, logs, errors, performance data, and recommendations
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -235,48 +367,191 @@ npm install
 VERCEL_API_TOKEN=your_api_token_here
 ```
 
-2. Start MCP server:
+2. Build and start MCP server:
 
 ```bash
+npm install
+npm run build
 npm start
 ```
 
 ## 🔗 Integrating with AI Assistants
 
-### Integrating with Claude
+### 🎯 Integrating with Cursor (Recommended)
 
-Claude supports MCP tools via its Anthropic Console or Claude Code interface.
+Cursor has built-in MCP support. Follow these steps to integrate the Vercel MCP server:
 
-1. Start the MCP server locally with `npm start`
-2. In Claude Code, use the `/connect` command:
-   ```
-   /connect mcp --path [path-to-server]
-   ```
-   For CLI-based servers using stdio, specify the path to the server executable
-3. Claude will automatically discover the available Vercel tools
-4. You can then ask Claude to perform Vercel operations, for example:
-   ```
-   Please list my recent Vercel deployments using the vercel-list-all-deployments tool
-   ```
-5. Alternatively, you can expose the MCP server as an HTTP server with a tool like `mcp-proxy`
-   ```bash
-   npm install -g @modelcontextprotocol/proxy
-   mcp-proxy --stdio --cmd "npm start" --port 3399
-   ```
-   Then connect in Claude: `/connect mcp --url http://localhost:3399`
+#### Step 1: Configure MCP Settings
 
-### Integrating with Cursor
+1. Open Cursor Settings (`Ctrl/Cmd + ,`)
+2. Search for "MCP" or navigate to `Features → Model Context Protocol`
+3. Add the Vercel MCP server configuration
 
-Cursor has built-in support for MCP tools through its extension system.
+#### Step 2: Add to MCP Configuration JSON
 
-1. Start the MCP server with `npm start`
-2. In Cursor, access Settings → Tools
-3. Under "Model Context Protocol (MCP)", click "+ Add MCP tool"
-4. Configure a new connection:
-   - For stdio transport: Point to the executable path
-   - For HTTP transport: Specify the URL (e.g., http://localhost:3399)
-5. Cursor will automatically discover the available Vercel tools
-6. Use Cursor's AI features to interact with your Vercel deployments by mentioning the tools in your prompts
+Add this configuration to your MCP settings JSON:
+
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "node",
+      "args": [
+        "C:/Users/YourUsername/path/to/mcp-vercel/build/index.js"
+      ],
+      "env": {
+        "VERCEL_API_TOKEN": "your_vercel_token_here"
+      }
+    }
+  }
+}
+```
+
+**🔧 Configuration Options:**
+
+**Option A: Direct Node Command (Recommended)**
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "node",
+      "args": ["C:/path/to/mcp-vercel/build/index.js"],
+      "env": {
+        "VERCEL_API_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+**Option B: Using NPM Start**
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "npm",
+      "args": ["start"],
+      "cwd": "C:/path/to/mcp-vercel",
+      "env": {
+        "VERCEL_API_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+**Option C: HTTP Transport (Alternative)**
+```json
+{
+  "mcpServers": {
+    "vercel-http": {
+      "command": "node",
+      "args": ["C:/path/to/mcp-vercel/build/index.js", "--http", "--port=3001"],
+      "env": {
+        "VERCEL_API_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+#### Step 3: Get Your Vercel API Token
+
+1. Go to [Vercel Dashboard → Settings → Tokens](https://vercel.com/account/tokens)
+2. Click "Create Token"
+3. Name it (e.g., "MCP Integration") 
+4. Set expiration and scope as needed
+5. Copy the token and use it in your configuration
+
+#### Step 4: Update File Paths
+
+**Windows Example:**
+```json
+"args": ["C:/Users/YourUsername/code/mcp-vercel/build/index.js"]
+```
+
+**Mac/Linux Example:**
+```json
+"args": ["/Users/yourusername/code/mcp-vercel/build/index.js"]
+```
+
+#### Step 5: Test the Integration
+
+1. Restart Cursor after adding the configuration
+2. Open the MCP panel or start a new chat
+3. You should see "vercel" listed as an available MCP server
+4. Test with a simple command:
+   ```
+   Please list my recent Vercel deployments
+   ```
+
+#### Step 6: Usage Examples
+
+Once connected, you can ask Cursor to:
+
+```
+Show me my recent deployments with status details
+
+List all projects in my Vercel account
+
+Get deployment logs for project "my-app"
+
+Search for error logs in the last 24 hours
+
+Create a new deployment for my "blog" project
+
+Debug deployment issues for deployment dpl_abc123
+
+Check runtime errors for my production app
+```
+
+### 🌟 Integrating with Claude Desktop
+
+Claude Desktop also supports MCP through configuration:
+
+1. Create/edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows)
+
+2. Add the Vercel server:
+
+```json
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "node",
+      "args": ["/path/to/mcp-vercel/build/index.js"],
+      "env": {
+        "VERCEL_API_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop
+
+### 🔧 Troubleshooting
+
+**Common Issues:**
+
+1. **"Server not found" error:**
+   - Check that the file path is correct and absolute
+   - Ensure Node.js is installed and accessible
+   - Verify the build directory exists (`npm run build`)
+
+2. **"Authentication error":**
+   - Verify your VERCEL_API_TOKEN is correct
+   - Check token hasn't expired
+   - Ensure token has necessary permissions
+
+3. **"Connection failed":**
+   - Make sure no other process is using the same port (for HTTP mode)
+   - Check that all dependencies are installed (`npm install`)
+   - Try removing and re-adding the MCP server configuration
+
+4. **Tools not appearing:**
+   - Restart your IDE/editor after configuration changes
+   - Check the MCP server logs for any startup errors
+   - Verify the configuration JSON syntax is valid
 
 ### Programmatic Integration
 
@@ -470,6 +745,116 @@ const customEnv = await mcpClient.callTool({
 });
 ```
 
+### Get Project Logs
+
+```javascript
+// Get recent application logs
+const projectLogs = await mcpClient.callTool({
+  name: "vercel-get-project-logs",
+  args: {
+    projectId: "my-project-id",
+    limit: 100,
+    level: "error", // Only error logs
+    since: Date.now() - 24 * 60 * 60 * 1000, // Last 24 hours
+  },
+});
+
+// Get logs from specific source
+const runtimeLogs = await mcpClient.callTool({
+  name: "vercel-get-project-logs",
+  args: {
+    projectId: "my-project-id",
+    source: "runtime",
+    limit: 500,
+  },
+});
+```
+
+### Debug Deployment Issues
+
+```javascript
+// Get comprehensive debugging information
+const debugInfo = await mcpClient.callTool({
+  name: "vercel-debug-deployment",
+  args: {
+    deploymentId: "dpl_abc123xyz",
+    includeMetrics: true,
+  },
+});
+
+// Get specific deployment logs
+const deploymentLogs = await mcpClient.callTool({
+  name: "vercel-get-deployment-logs",
+  args: {
+    deploymentId: "dpl_abc123xyz",
+    follow: false,
+    limit: 200,
+  },
+});
+
+// Get runtime errors for troubleshooting
+const runtimeErrors = await mcpClient.callTool({
+  name: "vercel-get-runtime-errors",
+  args: {
+    projectId: "my-project-id",
+    since: Date.now() - 12 * 60 * 60 * 1000, // Last 12 hours
+    status: "500", // Server errors only
+  },
+});
+```
+
+### Search and Analyze Logs
+
+```javascript
+// Search for specific error messages
+const searchResults = await mcpClient.callTool({
+  name: "vercel-search-logs",
+  args: {
+    query: "TypeError: Cannot read property",
+    projectId: "my-project-id",
+    level: "error",
+    limit: 50,
+  },
+});
+
+// Get function execution logs
+const functionLogs = await mcpClient.callTool({
+  name: "vercel-get-function-logs",
+  args: {
+    functionId: "api/users",
+    deploymentId: "dpl_abc123xyz",
+    limit: 100,
+  },
+});
+```
+
+### Set Up Log Forwarding
+
+```javascript
+// Create log drain for external monitoring
+const logDrain = await mcpClient.callTool({
+  name: "vercel-create-log-drain",
+  args: {
+    name: "DataDog Integration",
+    projectId: "my-project-id",
+    url: "https://http-intake.logs.datadoghq.com/v1/input/YOUR_API_KEY",
+    format: "json",
+    headers: {
+      "DD-API-KEY": "your-datadog-api-key",
+      "Content-Type": "application/json",
+    },
+  },
+});
+
+// List existing log drains
+const logDrains = await mcpClient.callTool({
+  name: "vercel-get-log-drains",
+  args: {
+    projectId: "my-project-id",
+  },
+});
+```
+
 ## 🐳 Docker Deployment
 
 ### Build the Image
@@ -543,3 +928,161 @@ src/
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details
+
+## 🛠️ Troubleshooting & Known Issues
+
+### Parameter Validation Errors (RESOLVED)
+
+If you were experiencing errors like:
+```json
+{
+  "code": "invalid_type",
+  "expected": "string", 
+  "received": "undefined",
+  "path": ["parameterName"],
+  "message": "Required"
+}
+```
+
+**This has been fixed!** The issue was caused by:
+
+1. **Schema/Handler Mismatch**: Tool definitions using Zod validation schemas that didn't match actual Vercel API requirements
+2. **Non-existent API Endpoints**: Some tools were calling hypothetical endpoints that don't exist in the Vercel REST API
+3. **Parameter Handling Issues**: Incorrect parameter extraction causing values to be undefined
+
+### ✅ **Current Working Tools**
+
+**✅ Fully Functional:**
+- `vercel-list-all-deployments` - List deployments with filtering
+- `vercel-get-deployment` - Get deployment details by ID/URL  
+- `vercel-list-deployment-files` - List files in a deployment
+- `vercel-get-deployment-logs` - Get build logs and deployment events
+- `vercel-debug-deployment` - Comprehensive deployment debugging
+- `vercel-get-environments` - Get project environment variables
+- `vercel-list-projects` - List all projects with filtering
+- `vercel-create-project` - Create new projects
+- `vercel-create-deployment` - Create new deployments
+- `vercel-list-all-teams` - List accessible teams
+- `vercel-create-team` - Create new teams
+- `vercel-create-environment-variables` - Bulk create environment variables
+- `vercel-create-custom-environment` - Create custom deployment environments
+
+**⚠️ Limited Functionality (Documentation/Guidance Only):**
+- `vercel-get-project-logs` - **Now requires both projectId AND deploymentId** for runtime logs
+- `vercel-get-function-logs` - Provides guidance (function logs are in runtime logs)
+- `vercel-search-logs` - Provides guidance (search primarily in dashboard)
+- `vercel-get-runtime-errors` - Provides guidance (dashboard feature)
+- `vercel-get-build-errors` - Provides guidance (use deployment logs)
+
+**🔒 Pro/Enterprise Features:**
+- `vercel-get-log-drains` - Log drain configuration  
+- `vercel-create-log-drain` - Create external log aggregation
+
+### 📚 **Correct Tool Usage Examples**
+
+#### ✅ Get Runtime Logs (Fixed)
+```json
+{
+  "name": "vercel-get-project-logs",
+  "args": {
+    "projectId": "prj_Lguu1nYTot8A0lRe5QzceCiixLOl",
+    "deploymentId": "dpl_fKLcALFLXwFieSD3BQBqPypqFnRS",
+    "teamId": "team_NjfKUTgJtJLRNjTmopEzMLo8"
+  }
+}
+```
+
+#### ✅ Get Build/Deployment Logs
+```json
+{
+  "name": "vercel-get-deployment-logs", 
+  "args": {
+    "deploymentId": "dpl_fKLcALFLXwFieSD3BQBqPypqFnRS",
+    "teamId": "team_NjfKUTgJtJLRNjTmopEzMLo8"
+  }
+}
+```
+
+#### ✅ Debug Deployment Issues
+```json
+{
+  "name": "vercel-debug-deployment",
+  "args": {
+    "deploymentId": "dpl_fKLcALFLXwFieSD3BQBqPypqFnRS",
+    "teamId": "team_NjfKUTgJtJLRNjTmopEzMLo8"
+  }
+}
+```
+
+#### ✅ List Deployment Files
+```json
+{
+  "name": "vercel-list-deployment-files",
+  "args": {
+    "id": "dpl_fKLcALFLXwFieSD3BQBqPypqFnRS",
+    "teamId": "team_NjfKUTgJtJLRNjTmopEzMLo8"
+  }
+}
+```
+
+### 🔑 **Understanding Vercel API Limitations**
+
+#### Runtime Logs Reality Check
+According to Vercel documentation:
+- **Runtime logs are primarily a dashboard feature**
+- **API access is limited**: `GET /v1/projects/{projectId}/deployments/{deploymentId}/runtime-logs`
+- **Requires Pro/Enterprise plans** for extended retention and API access
+- **Alternative**: Use Log Drains to export logs to external services
+
+#### Build vs Runtime Logs
+- **Build Logs**: Available via `GET /v3/deployments/{id}/events` ✅
+- **Runtime Logs**: Limited API access, primarily dashboard-based ⚠️
+- **Function Logs**: Included in runtime logs when available ⚠️
+
+### 🎯 **Recommended Debugging Workflow**
+
+1. **Start with Deployment Status**:
+   ```json
+   {"name": "vercel-get-deployment", "args": {"idOrUrl": "your-deployment-id"}}
+   ```
+
+2. **Check Build Logs for Issues**:
+   ```json
+   {"name": "vercel-get-deployment-logs", "args": {"deploymentId": "your-deployment-id"}}
+   ```
+
+3. **Get Comprehensive Debug Info**:
+   ```json
+   {"name": "vercel-debug-deployment", "args": {"deploymentId": "your-deployment-id"}}
+   ```
+
+4. **For Runtime Issues**: Use Vercel Dashboard or set up Log Drains for programmatic access
+
+### 🔧 **API Token Requirements**
+
+Ensure your `VERCEL_API_TOKEN` has appropriate permissions:
+- **Team access** if using `teamId` parameters
+- **Project access** for the projects you're debugging
+- **Pro/Enterprise plan** for advanced logging features
+
+### 📞 **When to Use Dashboard vs API**
+
+**Use MCP Tools For:**
+- Deployment status and metadata ✅
+- Build logs and errors ✅ 
+- File listings and basic debugging ✅
+- Bulk operations (deployments, environments) ✅
+
+**Use Vercel Dashboard For:**
+- Real-time log streaming 🌐
+- Advanced log filtering and search 🔍
+- Runtime error analysis 🐛
+- Performance monitoring 📊
+
+### 🆘 **Still Having Issues?**
+
+1. **Check your API token permissions**
+2. **Verify project/team IDs are correct** 
+3. **Ensure you're on the right Vercel plan** for advanced features
+4. **Use the corrected tool schemas** as shown in examples above
+5. **For runtime debugging**: Combine MCP tools with dashboard investigation

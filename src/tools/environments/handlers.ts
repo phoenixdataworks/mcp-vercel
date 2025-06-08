@@ -8,17 +8,17 @@ import { CreateCustomEnvironmentSchema } from "./schema.js";
  * @returns A formatted response containing the environment variables or an error message
  */
 export async function handleGetEnvironments(params: GetEnvironmentsParams) {
-  try {
+    try {
     // Validation des paramètres d'entrée
-    if (!params || !params.arguments) {
-      const errorMsg = "Invalid request: Missing required arguments";
+    if (!params) {
+      const errorMsg = "Invalid request: Missing required parameters";
       console.error(errorMsg);
       return {
         content: [{ type: "text", text: errorMsg }],
       };
     }
 
-    const { idOrName } = params.arguments;
+    const { idOrName } = params;
 
     if (!idOrName || typeof idOrName !== "string") {
       const errorMsg = `Invalid request: idOrName parameter must be a non-empty string, received: ${JSON.stringify(

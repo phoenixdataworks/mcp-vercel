@@ -17,9 +17,7 @@ export interface EnvironmentVariablesResponse {
 
 //  Interface for the input parameters
 export interface GetEnvironmentsParams {
-  arguments: {
-    idOrName: string;
-  };
+  idOrName: string;
 }
 
 // Interface for creating custom environment
